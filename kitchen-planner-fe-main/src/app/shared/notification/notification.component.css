@@ -1,0 +1,78 @@
+/* Container */
+.notification-page {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Unread count info */
+.notification-page p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+/* Empty notifications message */
+.empty {
+  text-align: center;
+  color: gray;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* Notification list */
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each notification item */
+.notification-list li {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  flex-direction: column;
+  border-left: 4px solid transparent; /* default border for type styling */
+}
+
+/* Hover effect */
+.notification-list li:hover {
+  background-color: #f9f9f9;
+}
+
+/* Unread notification */
+.notification-list li.unread {
+  font-weight: bold;
+}
+
+/* Type-specific styling */
+.notification-list li.newOrder {
+  background-color: #e6f7ff; /* light blue */
+  border-left: 4px solid #1890ff; /* blue accent */
+}
+
+.notification-list li.newChef {
+  background-color: #fff7e6; /* light orange */
+  border-left: 4px solid #fa8c16; /* orange accent */
+}
+
+/* Notification text */
+.notification-item h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.notification-item p {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.notification-item small {
+  font-size: 12px;
+  color: gray;
+}

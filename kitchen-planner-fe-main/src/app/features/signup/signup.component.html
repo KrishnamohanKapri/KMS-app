@@ -1,0 +1,16 @@
+<div class="signup-wrapper">
+  <div class="signup-box">
+    <h2>Create Account</h2>
+    <p class="subtitle">Please add details to continue</p>
+    <form [formGroup]="signupForm" (ngSubmit)="signup()">
+  <input formControlName="firstName" placeholder="First Name" data-cy="signup-firstname-input" />
+  <input formControlName="lastName" placeholder="Last Name" data-cy="signup-lastname-input" />
+  <input formControlName="email" type="email" placeholder="Email" data-cy="signup-email-input" />
+  <input formControlName="password" type="password" placeholder="Password" data-cy="signup-password-input" />
+  <button type="submit" data-cy="signup-submit-btn">Sign Up</button>
+    </form>
+    <div class="extras">
+      <p>Already have an account? <a routerLink="/login">Login here</a></p>
+    </div>
+  </div>
+</div>

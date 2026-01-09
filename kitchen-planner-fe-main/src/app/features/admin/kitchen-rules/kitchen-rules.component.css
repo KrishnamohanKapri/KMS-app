@@ -1,0 +1,64 @@
+.rules-container {
+    max-width: 700px;
+    margin: 3rem auto;
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .rules-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #444;
+  }
+  
+  ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    line-height: 1.8;
+    color: #333;
+  }
+  
+  .admin-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.admin-actions button {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.admin-actions button mat-icon {
+  margin-right: 8px;
+  font-size: 22px;
+}
+
+.admin-actions button:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transform: translateY(-2px) scale(1.03);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

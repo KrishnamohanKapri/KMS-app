@@ -1,0 +1,361 @@
+@startuml KMS_ERD
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) <i>x</i>
+
+title Kitchen Management System (KMS) - Complete ERD
+
+' User Management
+table(User) {
+  primary_key(_id)
+  firstName: String
+  lastName: String
+  email: String (unique)
+  password: String
+  role: String (enum: user, admin, chef)
+  profileImage: String
+  isActive: Boolean
+  status: String (enum: active, inactive)
+  kitchenNo: String
+  createdAt: Date
+}
+
+table(Attendance) {
+  primary_key(_id)
+  foreign_key(user): ObjectId -> User._id
+  date: Date
+  isPresent: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Newsletter
+table(Newsletter) {
+  primary_key(_id)
+  email: String (unique)
+  isSubscribed: Boolean
+  createdAt: Date
+}
+
+' Meals & Categories
+table(Category) {
+  primary_key(_id)
+  name: String
+  description: String
+  createdAt: Date
+}
+
+table(Meal) {
+  primary_key(_id)
+  title: String
+  description: String
+  servings: Number
+  price: Number
+  foreign_key(category): ObjectId -> Category._id
+  images: [String]
+  isActive: Boolean
+  foreign_key(nutritionalInfo): ObjectId -> NutritionalInfo._id
+  foreign_key(dietaryInfo): ObjectId -> DietaryInfo._id
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Nutritional & Dietary Information
+table(NutritionalInfo) {
+  primary_key(_id)
+  calories: Number
+  protein: Number
+  carbohydrates: Number
+  fat: Number
+  fiber: Number
+  sugar: Number
+  sodium: Number
+  createdAt: Date
+  updatedAt: Date
+}
+
+table(DietaryInfo) {
+  primary_key(_id)
+  isVegetarian: Boolean
+  isVegan: Boolean
+  isGlutenFree: Boolean
+  isDairyFree: Boolean
+  isNutFree: Boolean
+  isHalal: Boolean
+  isKosher: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Allergens
+table(Allergen) {
+  primary_key(_id)
+  name: String
+  description: String
+  createdAt: Date
+}
+
+table(MealAllergen) {
+  primary_key(_id)
+  foreign_key(mealId): ObjectId -> Meal._id
+  foreign_key(allergenId): ObjectId -> Allergen._id
+  createdAt: Date
+}
+
+' Ingredients & Stock Management
+table(Ingredient) {
+  primary_key(_id)
+  name: String (unique)
+  description: String
+  category: String (enum: vegetable, fruit, meat, dairy, grain, spice, herb, other)
+  stock: Number
+  baseUnit: String (enum: g, kg, ml, l, tbsp, tsp, cup, piece, slice, whole)
+  packagingUnit: String (enum: sack, bag, box, bottle, can, jar, pack, bundle, carton, piece, whole)
+  packagingQuantity: Number
+  costPerPackage: Number
+  reorderLevel: Number
+  isActive: Boolean
+  unit: String (legacy)
+  costPerUnit: Number (legacy)
+  createdAt: Date
+  updatedAt: Date
+}
+
+table(IngredientBatch) {
+  primary_key(_id)
+  foreign_key(ingredientId): ObjectId -> Ingredient._id
+  packageQuantity: Number
+  baseUnitQuantity: Number
+  expiryDate: Date
+  receivedDate: Date
+  batchNumber: String
+  costPerPackage: Number
+  supplier: String
+  purchaseOrder: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+table(MealIngredient) {
+  primary_key(_id)
+  foreign_key(mealId): ObjectId -> Meal._id
+  foreign_key(ingredientId): ObjectId -> Ingredient._id
+  quantity: Number
+  unit: String
+  createdAt: Date
+}
+
+' Tags
+table(Tag) {
+  primary_key(_id)
+  name: String
+  description: String
+  createdAt: Date
+}
+
+table(MealTag) {
+  primary_key(_id)
+  foreign_key(mealId): ObjectId -> Meal._id
+  foreign_key(tagId): ObjectId -> Tag._id
+  createdAt: Date
+}
+
+' Meal Planning
+table(MealPlan) {
+  primary_key(_id)
+  date: Date
+  startDate: Date
+  endDate: Date
+  meals: [{
+    foreign_key(mealId): ObjectId -> Meal._id
+    servings: Number
+  }]
+  type: String (enum: day, week)
+  foreign_key(createdBy): ObjectId -> User._id
+  assignedStaff: [ObjectId] -> User._id
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Customer Management
+table(Customer) {
+  primary_key(_id)
+  customerId: String (unique)
+  foreign_key(user): ObjectId -> User._id
+  billingInfo: {
+    firstName: String
+    lastName: String
+    email: String
+    phone: String
+    address: {
+      street: String
+      city: String
+      state: String
+      zipCode: String
+      country: String
+    }
+    company: String
+    taxId: String
+  }
+  preferences: {
+    dietaryRestrictions: [String]
+    allergies: [String]
+    preferredPaymentMethod: String
+    newsletterSubscription: Boolean
+    marketingEmails: Boolean
+  }
+  loyaltyPoints: Number
+  totalOrders: Number
+  totalSpent: Number
+  status: String (enum: active, inactive, suspended)
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Payment Management
+table(Payment) {
+  primary_key(_id)
+  paymentId: String (unique)
+  foreign_key(order): ObjectId -> Order._id
+  foreign_key(customer): ObjectId -> Customer._id
+  amount: Number
+  currency: String
+  type: String (enum: paypal, stripe, card, cash, bank_transfer, crypto)
+  method: String (enum: credit_card, debit_card, paypal_wallet, stripe_wallet, bank_transfer, cash, crypto_wallet)
+  status: String (enum: pending, processing, completed, failed, refunded, cancelled)
+  paymentDetails: {
+    cardType: String
+    last4Digits: String
+    cardBrand: String
+    transactionId: String
+    paymentIntentId: String
+    bankName: String
+    accountNumber: String
+    routingNumber: String
+    cryptoType: String
+    walletAddress: String
+  }
+  billingAddress: {
+    street: String
+    city: String
+    state: String
+    zipCode: String
+    country: String
+  }
+  fees: {
+    processingFee: Number
+    taxAmount: Number
+    discountAmount: Number
+  }
+  metadata: {
+    ipAddress: String
+    userAgent: String
+    deviceType: String
+    location: String
+  }
+  refundInfo: {
+    refundedAmount: Number
+    refundReason: String
+    refundedAt: Date
+    refundTransactionId: String
+  }
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Orders
+table(Order) {
+  primary_key(_id)
+  orderId: String (unique)
+  foreign_key(user): ObjectId -> User._id
+  foreign_key(customer): ObjectId -> Customer._id
+  foreign_key(payment): ObjectId -> Payment._id
+  meals: [{
+    foreign_key(mealId): ObjectId -> Meal._id
+    quantity: Number
+    price: Number
+  }]
+  total: Number
+  subTotal: Number
+  tax: Number
+  deliveryFee: Number
+  discount: Number
+  billingInfo: Object
+  deliveryAddress: {
+    street: String
+    city: String
+    state: String
+    zipCode: String
+    country: String
+    instructions: String
+  }
+  status: String (enum: pending, confirmed, preparing, ready, delivered, cancelled, refunded)
+  estimatedDeliveryTime: Date
+  actualDeliveryTime: Date
+  specialInstructions: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Order History Tracking
+table(OrderHistory) {
+  primary_key(_id)
+  foreign_key(orderId): ObjectId -> Order._id
+  foreign_key(userId): ObjectId -> User._id
+  status: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  previousStatus: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  orderNumber: String
+  totalAmount: Number
+  foreign_key(changedBy): ObjectId -> User._id
+  notes: String
+  changedAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Notifications
+table(Notification) {
+  primary_key(_id)
+  foreign_key(userId): ObjectId -> User._id
+  title: String
+  message: String
+  type: String
+  isRead: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Relationships
+User ||--|| Customer : "has"
+User ||--o{ Attendance : "has"
+User ||--o{ Order : "places"
+User ||--o{ Notification : "receives"
+User ||--o{ MealPlan : "creates"
+User ||--o{ MealPlan : "assigned_to"
+
+Customer ||--o{ Order : "places"
+Customer ||--o{ Payment : "makes"
+Order ||--|| Payment : "has"
+Order ||--o{ OrderHistory : "tracks"
+User ||--o{ OrderHistory : "changes"
+
+Category ||--o{ Meal : "categorizes"
+Meal ||--o{ MealAllergen : "has"
+Allergen ||--o{ MealAllergen : "belongs_to"
+Meal ||--o{ MealIngredient : "contains"
+Ingredient ||--o{ MealIngredient : "used_in"
+Meal ||--o{ MealTag : "tagged_with"
+Tag ||--o{ MealTag : "applied_to"
+
+Meal ||--o{ MealPlan : "planned_in"
+Meal ||--o{ Order : "ordered_in"
+
+Ingredient ||--o{ IngredientBatch : "has_batches"
+
+Meal ||--|| NutritionalInfo : "has"
+Meal ||--|| DietaryInfo : "has"
+
+@enduml

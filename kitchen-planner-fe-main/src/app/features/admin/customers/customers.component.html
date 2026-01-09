@@ -1,0 +1,49 @@
+<div class="order-list-container">
+    <h2>Customers</h2>
+  
+    <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="Search by name or email" />
+  
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone </th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of filteredCustomers">
+          <td>{{ customer.user.firstName }} {{ customer.user.lastName }}</td>
+          <td>{{ customer.user.email }}</td>
+          <td>{{ customer.billingInfo.phone }} </td>
+          <td>{{ customer.status }}</td>
+          <td>{{ customer.createdAt | date:'short' }}</td>
+          <td class="action-buttons">
+  <button (click)="openCustomerDetail(customer)" mat-icon-button>
+    <mat-icon>visibility</mat-icon>
+  </button>
+  <button mat-icon-button (click)="deleteCustomer(customer._id)">
+    <mat-icon>delete</mat-icon>
+  </button>
+</td>
+
+        </tr>
+      </tbody>  
+    </table>
+  
+    <div class="pagination">
+  <button (click)="prevPage()" [disabled]="page === 1">Prev</button>
+  
+  <button *ngFor="let p of [].constructor(totalPages); let i = index"
+          (click)="goToPage(i + 1)"
+          [class.active]="page === i + 1">
+    {{ i + 1 }}
+  </button>
+  
+  <button (click)="nextPage()" [disabled]="page === totalPages">Next</button>
+</div>
+  </div>
+  

@@ -1,0 +1,32 @@
+# Secrets and configuration files
+**/config.env
+**/.env
+**/.env.*
+**/*.env
+**/secrets.yaml
+**/secrets.yml
+
+# Logs
+**/logs/
+**/*.log
+
+# Uploads (may contain sensitive data)
+**/uploads/
+!**/uploads/.gitkeep
+
+# Node modules (already in subdirs, but good to have at root)
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp

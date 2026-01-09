@@ -1,0 +1,12 @@
+<app-navbar [role]="'admin'"></app-navbar>
+<div class="tracking-container">
+    <h2>Order Tracking</h2>
+    
+    <ul class="tracking-list">
+      <li *ngFor="let update of trackingUpdates">
+        <strong>{{ update.orderId }}</strong> — {{ update.status }} 
+        <span class="timestamp">{{ update.timestamp }}</span>
+      </li>
+    </ul>
+  </div>
+  

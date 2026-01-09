@@ -1,0 +1,17 @@
+<header class="navbar">
+  <div class="navbar-left">
+    <img [src]="logoPath" height="40" class="logo" (click)="goHome()" alt="Logo" />
+    <span class="app-name">Kitchen Planner</span>
+  </div>
+
+  <nav class="navbar-links">
+    <a routerLink="/" routerLinkActive="active">Home</a>
+    <a routerLink="/customer/meals-list" routerLinkActive="active">Meals</a>
+    <a *ngIf="!isLoggedIn" routerLink="/login" routerLinkActive="active">Login</a>
+    <a *ngIf="isLoggedIn" routerLink="/customer/meals-list" routerLinkActive="active">
+      <mat-icon>shopping_cart</mat-icon>
+    </a>
+    <a *ngIf="isLoggedIn" routerLink="customer/customer-profile" routerLinkActive="active">Profile</a>
+    <a *ngIf="isLoggedIn" (click)="logout()">Logout</a>
+  </nav>
+</header>

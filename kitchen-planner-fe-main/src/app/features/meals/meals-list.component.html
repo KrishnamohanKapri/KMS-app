@@ -1,0 +1,147 @@
+<div class="meals-page-container">
+  <!-- Sidebar Filters -->
+  <aside class="sidebar-filters">
+    <!-- Dietary Info -->
+    <div class="filter-section">
+      <h4>Dietary Info</h4>
+      <div class="pill-container">
+        <div *ngFor="let key of dietaryKeys" (click)="filters.dietaryInfo[key] = !filters.dietaryInfo[key]"
+          [class.selected]="filters.dietaryInfo[key]" class="pill">
+          {{ key }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="filter-section">
+      <h4>Categories</h4>
+      <div class="pill-container">
+        <div *ngFor="let cat of categories" (click)="toggleCategory(cat)"
+          [class.selected]="filters.categories.includes(cat)" class="pill">
+          {{ cat }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Meal Type -->
+    <div class="filter-section">
+      <h4>Meal Type</h4>
+      <div class="pill-container">
+        <div *ngFor="let meal of mealType" (click)="toggleMealType(meal)"
+          [class.selected]="filters.mealType.includes(meal)" class="pill">
+          {{ meal | titlecase }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="filter-section">
+      <h4>Tags</h4>
+      <div class="pill-container">
+        <div *ngFor="let tag of tags" (click)="filters.tags[tag] = !filters.tags[tag]"
+          [class.selected]="filters.tags[tag]" class="pill">
+          {{ tag }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Allergens -->
+    <div class="filter-section">
+      <h4>Allergens</h4>
+      <div class="pill-container">
+        <div *ngFor="let allergen of allergens" (click)="toggleAllergen(allergen)"
+          [class.selected]="filters.allergens.includes(allergen)" class="pill">
+          {{ allergen }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Servings Slider -->
+    <div class="filter-section slider-section">
+      <h4>Servings</h4>
+      <mat-slider [min]="minServings" [max]="maxServings" step="1" class="custom-slider">
+        <input matSliderThumb [(ngModel)]="filters.servings" />
+      </mat-slider>
+      <div class="slider-value">{{ filters.servings }}+</div>
+    </div>
+
+    <!-- Price Slider -->
+    <div class="filter-section slider-section">
+      <h4>Price</h4>
+      <mat-slider [min]="0" [max]="100" step="1" class="custom-slider">
+        <input matSliderStartThumb [(ngModel)]="filters.price.min" />
+        <input matSliderEndThumb [(ngModel)]="filters.price.max" />
+      </mat-slider>
+      <div class="slider-value">
+        {{ filters.price.min }} – {{ filters.price.max }}
+      </div>
+    </div>
+
+    <!-- Preferences Toggle -->
+    <div class="filter-section">
+      <mat-slide-toggle [(ngModel)]="filters.showPreferences">Show My Preferences</mat-slide-toggle>
+    </div>
+
+    <button class="apply-btn" (click)="applyFilters()">Apply Filters</button>
+  </aside>
+
+  <!-- Meals Grid -->
+  <section class="meals-grid-container">
+    <h2 class="title">Today's Meals</h2>
+
+    <!-- Grouped Meals by Category -->
+    <div *ngFor="let cat of mealGroupsKeys">
+      <h3>{{ cat | titlecase }}</h3>
+      <div class="divider"></div>
+      <div class="meals-grid">
+        <div class="meal-card" *ngFor="let meal of mealsGrouped[cat]" [class.out-of-stock]="meal.stock === 0">
+
+          <div class="meal-image-wrapper">
+            <img [src]="meal.image || 'assets/images/No_Image_Available.jpg'" alt="{{ meal.name }}"
+              class="meal-image" />
+
+            <div class="tags-overlay">
+              <span *ngFor="let tag of meal.tags" class="meal-tag" [ngClass]="getTagClass(tag)">
+                {{ tag }}
+              </span>
+            </div>
+
+            <div *ngIf="meal.stock === 0" class="overlay">
+              <span>Out of Stock</span>
+            </div>
+
+            <div class="badge-container">
+              <span class="cooktime-badge">⏱️ {{ meal.cookTime }}m</span>
+              <span class="servings-badge">🍽️ {{ meal.stock }}</span>
+              <span class="price-badge">💶 {{ meal.price | currency:'EUR':'symbol':'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="!isWithinServingTime(meal)" class="time-overlay">
+            <mat-icon class="overlay-icon">schedule</mat-icon>
+            <span>Not Available Now</span>
+            <small>Available {{ meal.servingStart || '07:00' }} – {{ meal.servingEnd || '21:30' }}</small>
+          </div>
+
+          <div class="meal-info">
+            <h3><a [routerLink]="['/customer/meal', meal.id]" class="meal-link">{{ meal.name }}</a></h3>
+            <p>{{ meal.description }}</p>
+
+            <ng-container *ngIf="meal.stock > 0">
+              <div class="quantity-selector">
+                <button (click)="decreaseQty(meal)" [disabled]="!isWithinServingTime(meal)">−</button>
+                <span>{{ meal.quantity }}</span>
+                <button (click)="increaseQty(meal)" [disabled]="!isWithinServingTime(meal)">+</button>
+              </div>
+
+              <button class="add-btn" [disabled]="!isWithinServingTime(meal)" (click)="addToCart(meal)">
+                <mat-icon>add_shopping_cart</mat-icon> Add to Cart
+              </button>
+            </ng-container>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

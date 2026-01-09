@@ -1,0 +1,362 @@
+@startuml KMS_ERD
+
+!define ENTITY class
+!define PK <u>
+!define FK <i>
+
+title Kitchen Management System (KMS) - Complete ERD
+
+' User Management
+ENTITY User {
+  PK_id
+  firstName: String
+  lastName: String
+  email: String (unique)
+  password: String
+  role: String (enum: user, admin, chef)
+  profileImage: String
+  isActive: Boolean
+  status: String (enum: active, inactive)
+  kitchenNo: String
+  createdAt: Date
+}
+
+ENTITY Attendance {
+  PK_id
+  FK_user: ObjectId
+  date: Date
+  isPresent: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Newsletter
+ENTITY Newsletter {
+  PK_id
+  email: String (unique)
+  isSubscribed: Boolean
+  createdAt: Date
+}
+
+' Meals & Categories
+ENTITY Category {
+  PK_id
+  name: String
+  description: String
+  createdAt: Date
+}
+
+ENTITY Meal {
+  PK_id
+  title: String
+  description: String
+  servings: Number
+  price: Number
+  FK_category: ObjectId
+  images: [String]
+  isActive: Boolean
+  FK_nutritionalInfo: ObjectId
+  FK_dietaryInfo: ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Nutritional & Dietary Information
+ENTITY NutritionalInfo {
+  PK_id
+  calories: Number
+  protein: Number
+  carbohydrates: Number
+  fat: Number
+  fiber: Number
+  sugar: Number
+  sodium: Number
+  createdAt: Date
+  updatedAt: Date
+}
+
+ENTITY DietaryInfo {
+  PK_id
+  isVegetarian: Boolean
+  isVegan: Boolean
+  isGlutenFree: Boolean
+  isDairyFree: Boolean
+  isNutFree: Boolean
+  isHalal: Boolean
+  isKosher: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Allergens
+ENTITY Allergen {
+  PK_id
+  name: String
+  description: String
+  createdAt: Date
+}
+
+ENTITY MealAllergen {
+  PK_id
+  FK_mealId: ObjectId
+  FK_allergenId: ObjectId
+  createdAt: Date
+}
+
+' Ingredients & Stock Management
+ENTITY Ingredient {
+  PK_id
+  name: String (unique)
+  description: String
+  category: String (enum: vegetable, fruit, meat, dairy, grain, spice, herb, other)
+  stock: Number
+  baseUnit: String (enum: g, kg, ml, l, tbsp, tsp, cup, piece, slice, whole)
+  packagingUnit: String (enum: sack, bag, box, bottle, can, jar, pack, bundle, carton, piece, whole)
+  packagingQuantity: Number
+  costPerPackage: Number
+  reorderLevel: Number
+  isActive: Boolean
+  unit: String (legacy)
+  costPerUnit: Number (legacy)
+  createdAt: Date
+  updatedAt: Date
+}
+
+ENTITY IngredientBatch {
+  PK_id
+  FK_ingredientId: ObjectId
+  packageQuantity: Number
+  baseUnitQuantity: Number
+  expiryDate: Date
+  receivedDate: Date
+  batchNumber: String
+  costPerPackage: Number
+  supplier: String
+  purchaseOrder: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+ENTITY MealIngredient {
+  PK_id
+  FK_mealId: ObjectId
+  FK_ingredientId: ObjectId
+  quantity: Number
+  unit: String
+  createdAt: Date
+}
+
+' Tags
+ENTITY Tag {
+  PK_id
+  name: String
+  description: String
+  createdAt: Date
+}
+
+ENTITY MealTag {
+  PK_id
+  FK_mealId: ObjectId
+  FK_tagId: ObjectId
+  createdAt: Date
+}
+
+' Meal Planning
+ENTITY MealPlan {
+  PK_id
+  date: Date
+  startDate: Date
+  endDate: Date
+  meals: [{
+    FK_mealId: ObjectId
+    servings: Number
+  }]
+  type: String (enum: day, week)
+  FK_createdBy: ObjectId
+  assignedStaff: [ObjectId]
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Customer Management
+ENTITY Customer {
+  PK_id
+  customerId: String (unique)
+  FK_user: ObjectId
+  billingInfo: {
+    firstName: String
+    lastName: String
+    email: String
+    phone: String
+    address: {
+      street: String
+      city: String
+      state: String
+      zipCode: String
+      country: String
+    }
+    company: String
+    taxId: String
+  }
+  preferences: {
+    dietaryRestrictions: [String]
+    allergies: [String]
+    preferredPaymentMethod: String
+    newsletterSubscription: Boolean
+    marketingEmails: Boolean
+  }
+  loyaltyPoints: Number
+  totalOrders: Number
+  totalSpent: Number
+  status: String (enum: active, inactive, suspended)
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Payment Management
+ENTITY Payment {
+  PK_id
+  paymentId: String (unique)
+  FK_order: ObjectId
+  FK_customer: ObjectId
+  amount: Number
+  currency: String
+  type: String (enum: paypal, stripe, card, cash, bank_transfer, crypto)
+  method: String (enum: credit_card, debit_card, paypal_wallet, stripe_wallet, bank_transfer, cash, crypto_wallet)
+  status: String (enum: pending, processing, completed, failed, refunded, cancelled)
+  paymentDetails: {
+    cardType: String
+    last4Digits: String
+    cardBrand: String
+    transactionId: String
+    paymentIntentId: String
+    bankName: String
+    accountNumber: String
+    routingNumber: String
+    cryptoType: String
+    walletAddress: String
+  }
+  billingAddress: {
+    street: String
+    city: String
+    state: String
+    zipCode: String
+    country: String
+  }
+  fees: {
+    processingFee: Number
+    taxAmount: Number
+    discountAmount: Number
+  }
+  metadata: {
+    ipAddress: String
+    userAgent: String
+    deviceType: String
+    location: String
+  }
+  refundInfo: {
+    refundedAmount: Number
+    refundReason: String
+    refundedAt: Date
+    refundTransactionId: String
+  }
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Orders
+ENTITY Order {
+  PK_id
+  orderId: String (unique)
+  FK_user: ObjectId
+  FK_customer: ObjectId
+  FK_payment: ObjectId
+  meals: [{
+    FK_mealId: ObjectId
+    quantity: Number
+    price: Number
+  }]
+  total: Number
+  subTotal: Number
+  tax: Number
+  deliveryFee: Number
+  discount: Number
+  billingInfo: Object
+  deliveryAddress: {
+    street: String
+    city: String
+    state: String
+    zipCode: String
+    country: String
+    instructions: String
+  }
+  status: String (enum: pending, confirmed, preparing, ready, delivered, cancelled, refunded)
+  estimatedDeliveryTime: Date
+  actualDeliveryTime: Date
+  specialInstructions: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Order History Tracking
+ENTITY OrderHistory {
+  PK_id
+  FK_orderId: ObjectId
+  FK_userId: ObjectId
+  status: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  previousStatus: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  orderNumber: String
+  totalAmount: Number
+  FK_changedBy: ObjectId
+  notes: String
+  changedAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Notifications
+ENTITY Notification {
+  PK_id
+  FK_userId: ObjectId
+  title: String
+  message: String
+  type: String
+  isRead: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Relationships
+User ||--|| Customer : "has"
+User ||--o{ Attendance : "has"
+User ||--o{ Order : "places"
+User ||--o{ Notification : "receives"
+User ||--o{ MealPlan : "creates"
+User ||--o{ MealPlan : "assigned_to"
+
+Customer ||--o{ Order : "places"
+Customer ||--o{ Payment : "makes"
+Order ||--|| Payment : "has"
+Order ||--o{ OrderHistory : "tracks"
+User ||--o{ OrderHistory : "changes"
+
+Category ||--o{ Meal : "categorizes"
+Meal ||--o{ MealAllergen : "has"
+Allergen ||--o{ MealAllergen : "belongs_to"
+Meal ||--o{ MealIngredient : "contains"
+Ingredient ||--o{ MealIngredient : "used_in"
+Meal ||--o{ MealTag : "tagged_with"
+Tag ||--o{ MealTag : "applied_to"
+
+Meal ||--o{ MealPlan : "planned_in"
+Meal ||--o{ Order : "ordered_in"
+
+Ingredient ||--o{ IngredientBatch : "has_batches"
+
+Meal ||--|| NutritionalInfo : "has"
+Meal ||--|| DietaryInfo : "has"
+
+@enduml 

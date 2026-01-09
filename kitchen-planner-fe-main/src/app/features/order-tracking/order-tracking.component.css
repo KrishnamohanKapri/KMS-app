@@ -1,0 +1,36 @@
+.tracking-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .tracking-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .tracking-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .tracking-list li {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+  }
+  
+  .timestamp {
+    font-size: 0.85rem;
+    color: #777;
+    font-weight: normal;
+  }
+  

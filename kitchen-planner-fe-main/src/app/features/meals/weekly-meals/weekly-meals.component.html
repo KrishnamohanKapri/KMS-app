@@ -1,0 +1,113 @@
+<div class="meals-page-container">
+
+  <!-- Sidebar Filters -->
+  <aside class="sidebar-filters">
+    <!-- Dietary Info -->
+    <div class="filter-section">
+      <h4>Dietary Info</h4>
+      <div class="pill-container">
+        <div *ngFor="let key of dietaryKeys" (click)="filters.dietaryInfo[key] = !filters.dietaryInfo[key]"
+          [class.selected]="filters.dietaryInfo[key]" class="pill">
+          {{ key }}
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4>Categories</h4>
+      <div class="pill-container">
+        <div *ngFor="let cat of categories" class="pill" [class.selected]="filters.categories.includes(cat)"
+          (click)="toggleCategory(cat)">
+          {{ cat }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="filter-section">
+      <h4>Tags</h4>
+      <div class="pill-container">
+        <div *ngFor="let tag of tags" (click)="filters.tags[tag] = !filters.tags[tag]"
+          [class.selected]="filters.tags[tag]" class="pill">
+          {{ tag }}
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4>Allergens</h4>
+      <div class="pill-container">
+        <div *ngFor="let a of allergens" class="pill" [class.selected]="filters.allergens.includes(a)"
+          (click)="toggleAllergen(a)">
+          {{ a }}
+        </div>
+      </div>
+    </div>
+
+     <!-- Servings -->
+    <div class="filter-section slider-section">
+      <h4>Servings</h4>
+      <mat-slider [min]="minServings" [max]="maxServings" step="1" class="custom-slider">
+        <input matSliderThumb [(ngModel)]="filters.servings" />
+      </mat-slider>
+      <div class="slider-value">{{ filters.servings }}+</div>
+    </div>
+
+    <div class="filter-section slider-section">
+      <h4>Price</h4>
+      <mat-slider [min]="0" [max]="100" step="1" class="custom-slider">
+        <input matSliderStartThumb [(ngModel)]="filters.price.min" />
+        <input matSliderEndThumb [(ngModel)]="filters.price.max" />
+      </mat-slider>
+      <div class="slider-value">
+        {{ filters.price.min }} – {{ filters.price.max }}
+      </div>
+    </div>
+<!-- Show My Preferences -->
+    <div class="filter-section">
+      <mat-slide-toggle [(ngModel)]="filters.showPreferences">Show My Preferences</mat-slide-toggle>
+    </div>
+    <button class="apply-btn" (click)="applyFilters()">Apply Filters</button>
+  </aside>
+
+  <!-- Weekly Meals -->
+  <section class="container">
+    <div *ngFor="let day of weekMeals">
+      <h3 class="day-title">{{ day.day }} ({{ day.date }})</h3>
+
+      <div class="meals-grid">
+        <div class="meal-card" *ngFor="let meal of day.filteredMeals || day.meals"
+          [class.out-of-stock]="meal.stock === 0">
+
+          <div class="meal-image-wrapper">
+            <img [src]="meal.image" alt="{{ meal.name }}" class="meal-image">
+
+            <!-- Tags -->
+            <div class="tags-overlay">
+              <span *ngFor="let tag of meal.tags" class="meal-tag" [ngStyle]="getTagStyle(tag)">
+                {{ tag }}
+              </span>
+            </div>
+
+            <!-- Servings Badge -->
+            <span class="servings-badge">🍽️ {{ meal.servings }}</span>
+
+            <!-- Price Badge -->
+            <div class="price-badge">💶 {{ meal.price | currency:'EUR':'symbol':'1.2-2' }}</div>
+
+            <!-- Out of stock overlay -->
+            <div *ngIf="meal.stock === 0" class="overlay">Out of Stock</div>
+
+          </div>
+
+          <div class="meal-info">
+            <h4><a [routerLink]="['/customer/meal', meal.id]" class="meal-link">{{ meal.name }}</a></h4>
+            <p>{{ meal.description }}</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

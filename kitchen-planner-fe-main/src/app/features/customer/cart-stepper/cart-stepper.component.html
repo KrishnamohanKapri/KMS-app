@@ -1,0 +1,59 @@
+<app-navbar></app-navbar>
+<div class="checkout-container">
+  <mat-horizontal-stepper
+    [linear]="true"
+    [selectedIndex]="selectedIndex"
+    labelPosition="bottom">
+
+    <!-- Custom icons for each state -->
+    <ng-template matStepperIcon="edit">
+      <mat-icon>radio_button_checked</mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="done">
+      <mat-icon color="primary">check_circle</mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="number">
+      <mat-icon>radio_button_unchecked</mat-icon>
+    </ng-template>
+
+    <!-- Steps -->
+    <mat-step>
+      <ng-template matStepLabel>
+        <mat-icon>shopping_cart</mat-icon>
+        <div>Cart</div>
+      </ng-template>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>
+        <mat-icon>receipt_long</mat-icon>
+        <div>Billing</div>
+      </ng-template>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>
+        <mat-icon>local_shipping</mat-icon>
+        <div>Shipping</div>
+      </ng-template>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>
+        <mat-icon>credit_card</mat-icon>
+        <div>Payment</div>
+      </ng-template>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>
+        <mat-icon>check_circle</mat-icon>
+        <div>Success</div>
+      </ng-template>
+    </mat-step>
+  </mat-horizontal-stepper>
+
+  <div class="step-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

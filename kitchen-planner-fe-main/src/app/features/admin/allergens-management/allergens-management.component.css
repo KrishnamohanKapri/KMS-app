@@ -1,0 +1,102 @@
+.allergens-management-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Header (Search + Button) */
+.allergens-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 220px;
+}
+
+.add-allergens-btn {
+  flex-shrink: 0;
+  min-width: 140px;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-table {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.mat-header-row {
+  background-color: #f5f5f5;
+}
+
+.mat-header-cell,
+.mat-cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+}
+
+.mat-cell {
+  color: #444;
+}
+
+.mat-header-cell {
+  font-weight: 600;
+  color: #222;
+}
+
+.mat-paginator {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+button[mat-raised-button] {
+  text-transform: none;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+button[mat-icon-button] {
+  margin-left: 4px;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #00796b;
+}
+/* Responsive */
+@media (max-width: 600px) {
+  .allergens-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-bar,
+  .add-allergens-btn {
+    width: 100%;
+  }
+  .mat-header-cell, 
+  .mat-cell {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .allergens-management-container {
+    margin: 1rem 0.5rem;
+    padding: 1rem;
+  }
+}

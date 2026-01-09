@@ -1,0 +1,12 @@
+const express = require("express");
+const chef = require("../controllers/chefController");
+const { isAuthenticated, isAdmin } = require("../middleware/auth");
+const router = express.Router();
+
+router.route("/").get(isAuthenticated, isAdmin, chef.getAllChefs);
+router.route("/:id").get(isAuthenticated, isAdmin, chef.getChefById);
+router.route("/attendance/mark").get(isAuthenticated, chef.markChefAttendance);
+router.route("/low-stock/:mealId").get(isAuthenticated, chef.lowStock);
+router.route("/get-attendance/:userId").post(isAuthenticated, chef.getChefAttendance);
+
+module.exports = router;

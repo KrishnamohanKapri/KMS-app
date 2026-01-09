@@ -1,0 +1,113 @@
+<h2 mat-dialog-title>{{ data.mode === 'edit' ? 'Edit Ingredient' : 'Add Ingredient' }}</h2>
+
+<form [formGroup]="ingredientForm" (ngSubmit)="onSubmit()">
+
+
+  <!-- Name -->
+  <mat-form-field appearance="outline">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" />
+    <mat-error *ngIf="nameCtrl?.hasError('required') && nameCtrl?.touched">
+      Name is required
+    </mat-error>
+    <mat-error *ngIf="nameCtrl?.hasError('maxlength')">
+      Maximum 100 characters allowed
+    </mat-error>
+  </mat-form-field>
+
+
+  <!-- Category (should come before State) -->
+  <mat-form-field appearance="outline">
+    <mat-label>Category</mat-label>
+    <mat-select formControlName="category">
+      <mat-option *ngFor="let c of categories" [value]="c.value">{{ c.label }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="categoryCtrl?.invalid && categoryCtrl?.touched">
+      Category is required
+    </mat-error>
+  </mat-form-field>
+
+  <!-- State (filtered by category) -->
+  <mat-form-field appearance="outline">
+    <mat-label>State</mat-label>
+    <mat-select formControlName="state">
+      <mat-option *ngFor="let s of states" [value]="s.value">{{ s.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Description (takes full width) -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="description" rows="3"></textarea>
+    <mat-error *ngIf="descriptionCtrl?.hasError('required') && descriptionCtrl?.touched">
+      Description is required
+    </mat-error>
+    <mat-error *ngIf="descriptionCtrl?.hasError('minlength')">
+      Minimum 10 characters required
+    </mat-error>
+    <mat-error *ngIf="descriptionCtrl?.hasError('maxlength')">
+      Maximum 500 characters allowed
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Base Unit -->
+<mat-form-field appearance="outline">
+  <mat-label>Base Unit</mat-label>
+  <mat-select formControlName="baseUnit">
+    <mat-option *ngFor="let u of baseUnits" [value]="u.value">{{ u.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+ <!-- Packaging Unit -->
+<mat-form-field appearance="outline">
+  <mat-label>Packaging Unit</mat-label>
+  <mat-select formControlName="packagingUnit">
+    <mat-option *ngFor="let p of packagingUnits" [value]="p.value">{{ p.label }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+
+  <!-- Packaging Quantity -->
+  <mat-form-field appearance="outline">
+    <mat-label>Packaging Quantity</mat-label>
+    <input matInput type="number" formControlName="packagingQuantity" />
+    <mat-error *ngIf="packagingQuantityCtrl?.hasError('min')">
+      Must be greater than 0
+    </mat-error>
+    <mat-error *ngIf="packagingQuantityCtrl?.hasError('max')">
+      Cannot exceed 10000
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Cost per Package -->
+  <mat-form-field appearance="outline">
+    <mat-label>Cost per Package</mat-label>
+    <input matInput type="number" formControlName="costPerPackage" />
+    <mat-error *ngIf="costPerPackageCtrl?.hasError('min')">
+      Cannot be negative
+    </mat-error>
+    <mat-error *ngIf="costPerPackageCtrl?.hasError('max')">
+      Cannot exceed 9999.99
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Reorder Level -->
+  <mat-form-field appearance="outline">
+    <mat-label>Reorder Level</mat-label>
+    <input matInput type="number" formControlName="reorderLevel" />
+    <mat-error *ngIf="reorderLevelCtrl?.hasError('min')">
+      Cannot be negative
+    </mat-error>
+    <mat-error *ngIf="reorderLevelCtrl?.hasError('max')">
+      Cannot exceed 10000
+    </mat-error>
+  </mat-form-field>
+
+  <!-- Actions -->
+  <div class="full-width" style="display: flex; justify-content: flex-end; gap: 1rem;">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="ingredientForm.invalid">
+      {{ data.mode === 'edit' ? 'Save Changes' : 'Add Ingredient' }}
+    </button>
+  </div>
+</form>

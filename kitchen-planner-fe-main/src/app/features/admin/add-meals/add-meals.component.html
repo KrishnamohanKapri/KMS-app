@@ -1,0 +1,276 @@
+<div class="meal-form-container">
+  <!-- Basic Info -->
+  <mat-card>
+    <mat-card-title>
+      {{ mode === 'add' ? 'Add Meal' : mode === 'edit' ? 'Edit Meal' : 'View Meal' }}
+    </mat-card-title>
+
+    <mat-card-content>
+      <form [formGroup]="mealForm" (ngSubmit)="saveMeal()">
+
+        <mat-form-field appearance="outline" data-cy="meal-title-field" id="meal-title-field">
+          <mat-label>Meal Title</mat-label>
+          <input matInput formControlName="name" placeholder="Enter meal title" data-cy="meal-title-input" id="meal-title-input" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" data-cy="meal-description-field" id="meal-description-field">
+          <mat-label>Description</mat-label>
+          <textarea matInput rows="3" formControlName="description" placeholder="Meal description" data-cy="meal-description-input" id="meal-description-input"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" data-cy="meal-servings-field" id="meal-servings-field">
+          <mat-label>Servings</mat-label>
+          <input matInput type="number" formControlName="servings" data-cy="meal-servings-input" id="meal-servings-input" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" data-cy="meal-price-field" id="meal-price-field">
+          <mat-label>Price</mat-label>
+          <input matInput type="number" step="0.01" formControlName="price" data-cy="meal-price-input" id="meal-price-input" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" data-cy="meal-cooktime-field" id="meal-cooktime-field">
+          <mat-label>Cooking Time(Minutes)</mat-label>
+          <input matInput type="number" formControlName="cookTime" data-cy="meal-cooktime-input" id="meal-cooktime-input" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" data-cy="meal-type-field" id="meal-type-field">
+          <mat-label>Time Type</mat-label>
+          <mat-select formControlName="mealType" [disabled]="mode === 'view'"
+            (selectionChange)="setMealsServingTime($event.value)" data-cy="meal-type-dropdown" id="meal-type-dropdown">
+            <mat-option value="breakfast" data-cy="meal-type-breakfast" id="meal-type-breakfast">Breakfast</mat-option>
+            <mat-option value="lunch" data-cy="meal-type-lunch" id="meal-type-lunch">Lunch</mat-option>
+            <mat-option value="dinner" data-cy="meal-type-dinner" id="meal-type-dinner">Dinner</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <form [formGroup]="mealForm" class="meal-form">
+          <mat-form-field appearance="outline" data-cy="serving-start-field" id="serving-start-field">
+            <mat-label>Serving Start</mat-label>
+            <input matInput type="time" formControlName="servingStart" data-cy="serving-start-input" id="serving-start-input">
+            <mat-error *ngIf="mealForm.get('servingStart')?.hasError('required')">
+              Serving start time is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" data-cy="serving-end-field" id="serving-end-field">
+            <mat-label>Serving End</mat-label>
+            <input matInput type="time" formControlName="servingEnd" data-cy="serving-end-input" id="serving-end-input">
+            <mat-error *ngIf="mealForm.get('servingEnd')?.hasError('required')">
+              Serving end time is required
+            </mat-error>
+          </mat-form-field>
+        </form>
+
+
+        <mat-form-field appearance="outline" data-cy="category-field" id="category-field">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category" data-cy="category-dropdown" id="category-dropdown">
+            <mat-option *ngFor="let category of categories" [value]="category._id" [attr.data-cy]="'category-option-' + category._id" [attr.id]="'category-option-' + category._id">
+              {{ category.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Ingredients -->
+        <mat-card>
+          <mat-card-title>Ingredients</mat-card-title>
+
+          <!-- Add Ingredient Section -->
+          <div *ngIf="mode !== 'view'" class="ingredient-add-wrapper">
+            <div [formGroup]="newIngredientForm" class="ingredient-add">
+              <mat-form-field appearance="outline" class="ingredient-name" data-cy="ingredient-name-field" id="ingredient-name-field">
+                <mat-label>Name</mat-label>
+                <mat-select formControlName="name" (selectionChange)="onIngredientSelected($event.value)" data-cy="ingredient-name-dropdown" id="ingredient-name-dropdown">
+                  <mat-option *ngFor="let ingredient of ingredients" [value]="ingredient.name" [attr.data-cy]="'ingredient-option-' + ingredient.name" [attr.id]="'ingredient-option-' + ingredient.name">
+                    {{ ingredient.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="qty" data-cy="ingredient-qty-field" id="ingredient-qty-field">
+                <mat-label>Quantity ({{ newIngredientForm.get('unit')?.value || 'unit' }})</mat-label>
+                <input matInput formControlName="quantity" data-cy="ingredient-qty-input" id="ingredient-qty-input" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="unit" data-cy="ingredient-unit-field" id="ingredient-unit-field">
+                <mat-label>Unit</mat-label>
+                <input matInput formControlName="unit" [readonly]="true" data-cy="ingredient-unit-input" id="ingredient-unit-input" />
+              </mat-form-field>
+
+              <button mat-raised-button color="primary" type="button" (click)="addIngredientManually()" data-cy="add-ingredient-btn" id="add-ingredient-btn">
+                Add
+              </button>
+            </div>
+          </div>
+
+          <!-- Ingredients Table -->
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z2 ingredients-table"
+            *ngIf="ingredientsArray.length > 0">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let ingredientCtrl" [formGroup]="ingredientCtrl">
+                <ng-container *ngIf="mode === 'edit'; else viewName">
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="name">
+                  </mat-form-field>
+                </ng-container>
+                <ng-template #viewName>{{ ingredientCtrl.get('name')?.value }}</ng-template>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef>Quantity</th>
+              <td mat-cell *matCellDef="let ingredientCtrl" [formGroup]="ingredientCtrl">
+                <ng-container *ngIf="mode === 'edit'; else viewQty">
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="quantity" type="number">
+                  </mat-form-field>
+                </ng-container>
+                <ng-template #viewQty>{{ ingredientCtrl.get('quantity')?.value }}</ng-template>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="unit">
+              <th mat-header-cell *matHeaderCellDef>Unit</th>
+              <td mat-cell *matCellDef="let ingredientCtrl" [formGroup]="ingredientCtrl">
+                <ng-container *ngIf="mode === 'edit'; else viewUnit">
+                  <mat-form-field appearance="outline">
+                    <input matInput formControlName="unit" readonly>
+                  </mat-form-field>
+                </ng-container>
+                <ng-template #viewUnit>{{ ingredientCtrl.get('unit')?.value }}</ng-template>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let ingredientCtrl; let i = index">
+                <button mat-icon-button color="warn" [disabled]="mode === 'view'" (click)="removeIngredient(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+        </mat-card>
+
+        <!-- Tags -->
+        <mat-card>
+          <mat-card-title>Tags</mat-card-title>
+          <mat-card-content>
+            <mat-form-field appearance="outline" data-cy="tags-field" id="tags-field">
+              <mat-label>Tags</mat-label>
+              <mat-select formControlName="tags" multiple data-cy="tags-dropdown" id="tags-dropdown">
+                <mat-option *ngFor="let tag of tags" [value]="tag.name" [attr.data-cy]="'tag-option-' + tag.name" [attr.id]="'tag-option-' + tag.name">
+                  {{ tag.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Allergens -->
+        <mat-card>
+          <mat-card-title>Allergens</mat-card-title>
+          <mat-card-content>
+            <mat-form-field appearance="outline" data-cy="allergens-field" id="allergens-field">
+              <mat-label>Allergens</mat-label>
+              <mat-select formControlName="allergens" multiple data-cy="allergens-dropdown" id="allergens-dropdown">
+                <mat-option *ngFor="let allergen of allergens" [value]="allergen.name" [attr.data-cy]="'allergen-option-' + allergen.name" [attr.id]="'allergen-option-' + allergen.name">
+                  {{ allergen.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Nutritional Info (Read-only) -->
+        <mat-card *ngIf="mode == 'view'">
+          <mat-card-title>Nutritional Information</mat-card-title>
+          <mat-card-content>
+            <div class="nutritional-grid">
+              <div><strong>Energy:</strong> {{ mealData?.nutritionalInfo?.energy.value }} {{
+                mealData?.nutritionalInfo?.energy.unit }}</div>
+              <div><strong>Fat:</strong> {{ mealData?.nutritionalInfo?.fat.value }} {{
+                mealData?.nutritionalInfo?.fat.unit }}</div>
+              <div><strong>Saturated Fat:</strong> {{ mealData?.nutritionalInfo?.saturatedFat.value }} {{
+                mealData?.nutritionalInfo?.saturatedFat.unit }}</div>
+              <div><strong>Carbohydrates:</strong> {{ mealData?.nutritionalInfo?.carbohydrates.value }} {{
+                mealData?.nutritionalInfo?.carbohydrates.unit }}</div>
+              <div><strong>Sugar:</strong> {{ mealData?.nutritionalInfo?.sugar.value }} {{
+                mealData?.nutritionalInfo?.sugar.unit }}</div>
+              <div><strong>Protein:</strong> {{ mealData?.nutritionalInfo?.protein.value }} {{
+                mealData?.nutritionalInfo?.protein.unit }}</div>
+              <div><strong>Salt:</strong> {{ mealData?.nutritionalInfo?.salt.value }} {{
+                mealData?.nutritionalInfo?.salt.unit }}</div>
+              <div><strong>Fiber:</strong> {{ mealData?.nutritionalInfo?.fiber.value }} {{
+                mealData?.nutritionalInfo?.fiber.unit }}</div>
+              <div><strong>Nutri-Score:</strong> {{ mealData?.nutritionalInfo?.nutriScore }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Dietary Info (Read-only) -->
+        <mat-card *ngIf="mode == 'view'">
+          <mat-card-title>Dietary Information</mat-card-title>
+          <mat-card-content>
+            <div class="dietary-grid">
+              <div><mat-icon color="primary">check</mat-icon> Vegetarian: {{ mealData?.dietaryInfo?.vegetarian ? 'Yes' :
+                'No' }}</div>
+              <div><mat-icon color="primary">check</mat-icon> Vegan: {{ mealData?.dietaryInfo?.vegan ? 'Yes' : 'No' }}
+              </div>
+              <div><mat-icon color="primary">check</mat-icon> Gluten Free: {{ mealData?.dietaryInfo?.glutenFree ? 'Yes'
+                : 'No' }}</div>
+              <div><mat-icon color="primary">check</mat-icon> Lactose Free: {{ mealData?.dietaryInfo?.lactoseFree ?
+                'Yes' : 'No' }}</div>
+              <div><mat-icon color="primary">check</mat-icon> Halal: {{ mealData?.dietaryInfo?.halal ? 'Yes' : 'No' }}
+              </div>
+              <div><mat-icon color="primary">check</mat-icon> Kosher: {{ mealData?.dietaryInfo?.kosher ? 'Yes' : 'No' }}
+              </div>
+              <div><mat-icon color="primary">check</mat-icon> Nut Free: {{ mealData?.dietaryInfo?.nutFree ? 'Yes' : 'No'
+                }}</div>
+              <div><mat-icon color="primary">check</mat-icon> Soy Free: {{ mealData?.dietaryInfo?.soyFree ? 'Yes' : 'No'
+                }}</div>
+              <div><mat-icon color="primary">check</mat-icon> Egg Free: {{ mealData?.dietaryInfo?.eggFree ? 'Yes' : 'No'
+                }}</div>
+              <div><mat-icon color="primary">check</mat-icon> Fish Free: {{ mealData?.dietaryInfo?.fishFree ? 'Yes' :
+                'No' }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Image Upload -->
+        <mat-card *ngIf="mode == 'add'">
+          <mat-card-title>Images</mat-card-title>
+          <div class="full-width">
+            <button mat-raised-button color="primary" type="button" (click)="fileInput.click()" data-cy="upload-image-btn" id="upload-image-btn">
+              {{ uploadedFileName ? 'Change Image' : 'Upload Image' }}
+            </button>
+            <input #fileInput type="file" hidden accept="image/*" (change)="onImageSelected($event)" data-cy="image-input" id="image-input" />
+          </div>
+          <div *ngIf="uploadedFileName" class="image-uploaded-info">
+            <span style="font-style: italic; color: green;">
+              Image uploaded: {{ uploadedFileName }}
+            </span>
+            <button *ngIf="uploadedFileName" mat-icon-button color="warn" type="button" (click)="removeImage()"
+              aria-label="Remove image" data-cy="remove-image-btn" id="remove-image-btn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-card>
+
+        <!-- Form Actions -->
+        <div class="actions">
+          <button mat-button color="warn" type="button" (click)="goBackToMeals()" data-cy="cancel-btn" id="cancel-btn">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" *ngIf="mode !== 'view'" data-cy="submit-btn" id="submit-btn">
+            {{ mode === 'edit' ? 'Update Meal' : 'Add Meal' }}
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

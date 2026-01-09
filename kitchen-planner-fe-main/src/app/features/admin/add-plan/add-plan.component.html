@@ -1,0 +1,139 @@
+<form [formGroup]="planForm" (ngSubmit)="savePlan()" class="meal-plan-container">
+
+  <h2 class="plan-title">
+    {{ mode === 'view' ? 'View Meal Plan' : mode === 'edit' ? 'Update Meal Plan' : 'Add Meal Plan' }}
+  </h2>
+
+  <!-- Plan Type & Dates -->
+  <mat-card class="plan-card">
+    <mat-card-title class="section-title">Plan Details</mat-card-title>
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="full-width" data-cy="plan-type-field">
+        <mat-label>Plan Type</mat-label>
+        <mat-select formControlName="type" [disabled]="mode === 'view'" data-cy="plan-type-dropdown">
+          <mat-option value="day" data-cy="plan-type-day">Day</mat-option>
+          <mat-option value="week" data-cy="plan-type-week">Week</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width" data-cy="meal-time-type-field">
+        <mat-label>Time Type</mat-label>
+        <mat-select formControlName="mealTimeType" [disabled]="mode === 'view'" (selectionChange)="getMealsList($event.value)" data-cy="meal-time-type-dropdown">
+          <mat-option value="breakfast" data-cy="meal-time-type-breakfast">Breakfast</mat-option>
+          <mat-option value="lunch" data-cy="meal-time-type-lunch">Lunch</mat-option>
+          <mat-option value="dinner" data-cy="meal-time-type-dinner">Dinner</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="date-fields">
+        <mat-form-field appearance="outline" class="date-input" *ngIf="planForm.get('type')?.value === 'day'" data-cy="plan-date-field">
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="datePicker" formControlName="date" [disabled]="mode === 'view'" data-cy="plan-date-input" />
+          <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+          <mat-datepicker #datePicker></mat-datepicker>
+          <mat-error *ngIf="planForm.get('date')?.hasError('required')">Date is required</mat-error>
+        </mat-form-field>
+
+        <ng-container *ngIf="planForm.get('type')?.value === 'week'">
+          <mat-form-field appearance="outline" class="date-input" data-cy="plan-start-date-field">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate" [disabled]="mode === 'view'" data-cy="plan-start-date-input" />
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+            <mat-error *ngIf="planForm.get('startDate')?.hasError('required')">Start date required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="date-input" data-cy="plan-end-date-field">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate" [disabled]="mode === 'view'" data-cy="plan-end-date-input" />
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+            <mat-error *ngIf="planForm.get('endDate')?.hasError('required')">End date required</mat-error>
+          </mat-form-field>
+        </ng-container>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Meals Section -->
+  <mat-card class="plan-card">
+    <mat-card-title class="section-title">Meals</mat-card-title>
+    <mat-card-content>
+      <table class="meals-table" formArrayName="meals">
+        <thead>
+          <tr>
+            <th>Meal</th>
+            <th>Servings</th>
+            <th *ngIf="mode !== 'view'"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mealCtrl of mealsFormArray.controls; let i = index" [formGroupName]="i">
+            <td>
+              <mat-form-field appearance="outline" class="meal-select" data-cy="plan-meal-field">
+                <mat-select formControlName="mealId" [disabled]="mode === 'view'" data-cy="plan-meal-dropdown">
+                  <mat-option *ngFor="let meal of mealsList" [value]="meal.id" [attr.data-cy]="'plan-meal-option-' + meal.id">{{ meal.name }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="mealCtrl.get('mealId')?.hasError('required')">Required</mat-error>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field appearance="outline" class="servings-input" data-cy="plan-meal-servings-field">
+                <input matInput type="number" min="1" formControlName="servings" [disabled]="mode === 'view'" data-cy="plan-meal-servings-input" />
+                <mat-error *ngIf="mealCtrl.get('servings')?.hasError('required')">Required</mat-error>
+                <mat-error *ngIf="mealCtrl.get('servings')?.hasError('min')">Must be at least 1</mat-error>
+              </mat-form-field>
+            </td>
+            <td *ngIf="mode !== 'view'">
+              <button mat-icon-button color="warn" (click)="removeMeal(i)" data-cy="remove-meal-btn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="mealsFormArray.length === 0">
+            <td colspan="3" class="no-meals">No meals added yet. Click below to add one!</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="add-meal-btn-wrapper">
+        <button mat-flat-button color="primary" class="add-meal-btn" type="button" (click)="addMeal()" *ngIf="mode !== 'view'" data-cy="add-meal-btn">
+          <mat-icon>add</mat-icon> Add Meal
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Staff Section -->
+  <mat-card class="plan-card">
+    <mat-card-title class="section-title">Assign Staff</mat-card-title>
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="full-width" data-cy="plan-staff-field">
+        <mat-label>Select Staff</mat-label>
+        <mat-select formControlName="assignedStaff" multiple [disabled]="mode === 'view'" data-cy="plan-staff-dropdown">
+          <mat-option *ngFor="let staff of staffList" [value]="staff.id" [attr.data-cy]="'plan-staff-option-' + staff.id">{{ staff.name }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="planForm.get('assignedStaff')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Notes Section -->
+  <mat-card class="plan-card">
+    <mat-card-title class="section-title">Notes</mat-card-title>
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="full-width" data-cy="plan-notes-field">
+        <mat-label>Notes</mat-label>
+        <textarea matInput formControlName="notes" [disabled]="mode === 'view'" data-cy="plan-notes-input"></textarea>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Actions -->
+  <div class="button-wrapper" *ngIf="mode !== 'view'">
+    <button mat-raised-button color="accent" type="submit" [disabled]="planForm.invalid" data-cy="save-plan-btn">
+      {{ mode === 'edit' ? 'Update Plan' : 'Save Plan' }}
+    </button>
+  </div>
+
+</form>

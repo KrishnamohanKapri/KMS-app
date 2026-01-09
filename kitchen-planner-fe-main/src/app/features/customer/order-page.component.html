@@ -1,0 +1,112 @@
+<div class="order-container">
+  <h2>Customer Information</h2>
+  <form [formGroup]="orderForm" (ngSubmit)="submitOrderInfo()">
+
+    <!-- Personal Info Section -->
+    <div class="form-section">
+      <h3>Personal Info</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['firstName'].invalid && f['firstName'].touched">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" />
+          <mat-error *ngIf="f['firstName'].invalid && f['firstName'].touched">First name is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['lastName'].invalid && f['lastName'].touched">
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="lastName" />
+          <mat-error *ngIf="f['lastName'].invalid && f['lastName'].touched">Last name is required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Address Section -->
+    <div class="form-section">
+      <h3>Address</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['street'].invalid && f['street'].touched">
+          <mat-label>Street</mat-label>
+          <input matInput formControlName="street" />
+          <mat-error *ngIf="f['street'].invalid && f['street'].touched">Street is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['hausnumber'].invalid && f['hausnumber'].touched">
+          <mat-label>House #</mat-label>
+          <input matInput formControlName="hausnumber" />
+          <mat-error *ngIf="f['hausnumber'].invalid && f['hausnumber'].touched">Hausnumber is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['zipCode'].invalid && f['zipCode'].touched">
+          <mat-label>Postal Code</mat-label>
+          <input matInput formControlName="zipCode" />
+          <mat-error *ngIf="f['zipCode'].invalid && f['zipCode'].touched">Postal code is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['city'].invalid && f['city'].touched">
+          <mat-label>City</mat-label>
+          <input matInput formControlName="city" />
+          <mat-error *ngIf="f['city'].invalid && f['city'].touched">City is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['state'].invalid && f['state'].touched">
+          <mat-label>State</mat-label>
+          <input matInput formControlName="state" />
+          <mat-error *ngIf="f['state'].invalid && f['state'].touched">State is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['country'].invalid && f['country'].touched">
+          <mat-label>Country</mat-label>
+          <mat-select formControlName="country">
+            <mat-option *ngFor="let country of countriesList" [value]="country">{{ country }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="f['country'].invalid && f['country'].touched">Country is required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="form-section">
+      <h3>Contact</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['phone'].invalid && f['phone'].touched">
+          <mat-label>Phone Number</mat-label>
+          <input matInput formControlName="phone" />
+          <mat-error *ngIf="f['phone'].invalid && f['phone'].touched">Phone is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" [class.invalid]="f['email'].invalid && f['email'].touched">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+          <mat-error *ngIf="f['email'].invalid && f['email'].touched">
+            <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+            <span *ngIf="f['email'].errors?.['email']">Invalid email format</span>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Company Info Section -->
+    <div class="form-section">
+      <h3>Company Info (Optional)</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Company Name</mat-label>
+          <input matInput formControlName="company" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Tax ID</mat-label>
+          <input matInput formControlName="taxId" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="next-btn" [disabled]="orderForm.invalid">Proceed to Delivery</button>
+    </div>
+  </form>
+</div>

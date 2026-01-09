@@ -1,0 +1,74 @@
+.order-list-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.order-list-container h2 {
+  text-align: center;
+  color: #00796b;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #00796b;
+  color: white;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+button {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005b4f;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+
+.pagination button {
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+}
+
+.pagination button.active {
+  background-color: #00796b;
+  color: white;
+  font-weight: bold;
+}

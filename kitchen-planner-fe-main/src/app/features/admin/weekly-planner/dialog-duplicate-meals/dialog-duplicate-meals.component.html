@@ -1,0 +1,41 @@
+<!-- duplicate-meal-plan-dialog.component.html -->
+<h2 mat-dialog-title>Duplicate Meal Plan</h2>
+<form [formGroup]="duplicateForm" (ngSubmit)="submit()">
+  <div mat-dialog-content>
+    <!-- <mat-form-field *ngIf="duplicateForm.value.type === 'day'" appearance="fill">
+      <mat-label>New Date</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field> -->
+    <mat-form-field appearance="fill" class="date-input" *ngIf="duplicateForm.get('type')?.value === 'day'">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="datePicker" formControlName="date" />
+        <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker #datePicker></mat-datepicker>
+        <mat-error *ngIf="duplicateForm.get('date')?.hasError('required')">Date is required</mat-error>
+      </mat-form-field>
+
+    <ng-container *ngIf="duplicateForm.value.type === 'week'">
+      <mat-form-field appearance="fill">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" [min]="minDate">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate" [min]="duplicateForm.value.startDate || minDate">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </ng-container>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="duplicateForm.invalid">Duplicate</button>
+  </div>
+</form>
+

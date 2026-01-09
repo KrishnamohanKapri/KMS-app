@@ -1,0 +1,85 @@
+<div class="page-container stock-management-container">
+  <h2>Stock Management</h2>
+
+  <!-- Header: Search + Add Stock -->
+  <div class="stock-header">
+    <mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Search Stocks</mat-label>
+      <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilter()" placeholder="Search by stock" />
+      <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''; applyFilter()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- <button mat-raised-button color="primary" class="add-stock-btn" (click)="openAddStock()">
+      Add New Stock
+    </button> -->
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="pagedItems.length > 0" class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Ingredient</th>
+          <th>Stock</th>
+          <th>Unit</th>
+          <th>Category</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of pagedItems">
+          <!-- Summary row -->
+          <tr>
+            <td>{{item.name}}</td>
+            <td>{{item.stock}}</td>
+            <td>{{item.unit}}</td>
+            <td>{{item.category | titlecase}}</td>
+            <td>
+              <button mat-button color="primary" (click)="$event.stopPropagation(); item.expanded = !item.expanded">
+                {{item.expanded ? 'Hide' : 'Details'}}
+              </button>
+              <button mat-button color="accent" (click)="openEditStock(item)">
+                Add New Stock
+              </button>
+              <button mat-button color="accent" (click)="addNewStockBatch(item)">
+                Add New Batch
+              </button>
+              <button mat-button color="accent" (click)="viewStockBatchInfo(item.id)">
+                View Stock Batches
+              </button>
+            </td>
+          </tr>
+
+          <!-- Expandable row -->
+          <tr *ngIf="item.expanded" class="expand-row">
+          <tr *ngIf="item.expanded" class="expand-row">
+            <td colspan="5">
+              <div class="details">
+                <p><strong>Description:</strong> {{item.description}}</p>
+                <p><strong>ReOrder Level:</strong> {{item.reorderLevel}}</p>
+                <p><strong>Packaging:</strong> {{item.packagingQuantity}} {{item.packagingUnit}} ({{item.baseUnit}})</p>
+                <p><strong>Cost per Package:</strong> {{item.costPerPackage | currency:'EUR':'symbol':'1.2-2'}}</p>
+                <p><strong>Stock Status:</strong> {{item.stockStatus}}</p>
+                <p><strong>Needs Reorder:</strong> {{item.needsReorder ? 'Yes' : 'No'}}</p>
+                <p><strong>Created At:</strong> {{item.createdAt | date:'medium'}}</p>
+                <p><strong>Updated At:</strong> {{item.updatedAt | date:'medium'}}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <!-- Paginator -->
+    <mat-paginator [length]="filteredItems.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
+
+  <!-- Empty Message -->
+  <div *ngIf="pagedItems.length === 0" class="empty-msg">
+    ✅ No stocks found
+  </div>
+</div>

@@ -1,0 +1,35 @@
+/* Hide all Leaflet Routing Machine containers and instructions */
+.leaflet-routing-container,
+.leaflet-bar.leaflet-routing-container,
+.leaflet-routing-container-hide,
+.leaflet-control.leaflet-routing-container,
+.leaflet-routing-alt,
+.leaflet-routing-alternatives-container {
+  display: none !important;
+}
+
+/* Emoji Marker Styles */
+::ng-deep .emoji-marker {
+  font-size: 20px;
+  text-align: center;
+  line-height: 32px;
+  background-color: #144b91ad;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transform-origin: center;
+}
+
+/* Flip the car icon when it's traveling west */
+::ng-deep .flip-container {
+  transform-origin: center;
+  display: inline-block;
+}
+
+::ng-deep .flip-container.mirror {
+  transform: scaleX(-1) rotate(0deg) !important;
+}
+
+/* Custom Map Control Positioning */
+::ng-deep .leaflet-custom-bar {
+  margin-top: 0 !important;
+}

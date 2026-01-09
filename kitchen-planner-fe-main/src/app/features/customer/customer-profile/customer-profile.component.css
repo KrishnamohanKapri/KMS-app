@@ -1,0 +1,209 @@
+/* =======================
+   Container & Layout
+======================= */
+.profile-container {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Headings */
+.profile-container h2 {
+  text-align: center;
+  color: #004d40;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+.profile-container h3, .profile-container h4 {
+  color: #00796b;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Form Sections */
+.form-section {
+  padding: 1.5rem;
+  background: #f1f8e9; /* soft green for card-like sections */
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+}
+
+/* Form layout */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Full width inputs */
+.full-width {
+  width: 100%;
+}
+
+/* =======================
+   Inputs, Selects, Errors
+======================= */
+/* Invalid fields */
+mat-form-field.invalid .mat-form-field-outline {
+  border-color: #e53935 !important;
+}
+
+mat-form-field.invalid input,
+mat-form-field.invalid mat-select,
+mat-form-field.invalid textarea {
+  border-color: #e53935 !important;
+}
+
+mat-error {
+  font-size: 0.85rem;
+  color: #e53935;
+}
+
+/* Mat-select enhancements */
+mat-form-field .mat-select-trigger {
+  background-color: #f1f8e9 !important;
+  border-radius: 6px;
+  padding: 0.3rem 0.5rem;
+}
+
+mat-form-field.mat-focused .mat-select-trigger {
+  background-color: #e0f2f1 !important;
+}
+
+/* Dropdown panel styling */
+.mat-select-panel {
+  background-color: #fff;
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.mat-select-panel .mat-option:hover {
+  background-color: #c8e6c9; /* soft green highlight */
+}
+
+.mat-select-panel .mat-option.mat-selected {
+  background-color: #a5d6a7;
+  color: #004d40;
+}
+
+/* =======================
+   Buttons
+======================= */
+/* Primary Save Button */
+button.mat-raised-button {
+  background-color: #00796b;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+button.mat-raised-button:hover:not(:disabled) {
+  background-color: #004d40;
+  transform: translateY(-2px);
+}
+
+button.mat-raised-button:disabled {
+  background-color: #a5d6a7;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+/* Secondary Cancel Button */
+button.mat-stroked-button {
+  border: 2px solid #d32f2f;
+  color: #d32f2f;
+  background-color: transparent;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button.mat-stroked-button:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+  transform: translateY(-2px);
+}
+
+button.mat-stroked-button:disabled {
+  border-color: #eee;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Button container */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* =======================
+   Summary Card
+======================= */
+.profile-summary-card {
+  max-width: 900px;
+  margin: 2rem auto 1rem auto;
+  padding: 1.5rem 2rem;
+  background: #f4f9f4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #00796b;
+}
+
+/* =======================
+   Dietary Options
+======================= */
+.dietary-options mat-checkbox {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #004d40;
+}
+
+/* =======================
+   Responsive adjustments
+======================= */
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+}

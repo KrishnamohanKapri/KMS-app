@@ -1,0 +1,71 @@
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Base snackbar container */
+.custom-snackbar, .error-snackbar {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  font-family: 'Roboto', sans-serif;
+  animation: slideIn 0.3s ease-out;
+  padding: 0;
+}
+
+/* Header part */
+.custom-snackbar .snackbar-header,
+.error-snackbar .snackbar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+}
+
+/* Success header */
+.custom-snackbar .snackbar-header {
+  background-color: #28a745; /* Green header */
+}
+
+/* Error header */
+.error-snackbar .snackbar-header {
+  background-color: #dc3545; /* Red header */
+}
+
+/* Icon in header */
+.snackbar-header i.material-icons {
+  font-size: 20px;
+  color: #fff;
+}
+
+/* Body part */
+.custom-snackbar .snackbar-body,
+.error-snackbar .snackbar-body {
+  background-color: #fff;
+  color: #111;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+/* Slide-in animation */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+/* Close button styling */
+.mat-simple-snackbar-action {
+  font-weight: 600;
+  color: #000;
+  margin-left: auto;
+}

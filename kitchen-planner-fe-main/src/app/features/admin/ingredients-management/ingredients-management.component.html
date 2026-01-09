@@ -1,0 +1,66 @@
+<div class="ingredients-management-container">
+    <h2>Ingredients Management</h2>
+  <div class="ingredients-header">
+<mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Search </mat-label>
+      <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilter()" placeholder="Search " />
+      <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm='';applyFilter()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+   <button mat-raised-button color="primary" class="add-ingredients-btn" (click)="openAdd()">
+      Add New Ingredients
+    </button>
+</div>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%;">
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let ingredients">{{ingredients.name}}</td>
+    </ng-container>
+
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef>Description</th>
+      <td mat-cell *matCellDef="let ingredients">{{ingredients.description}}</td>
+    </ng-container>
+
+    <!-- Category Column -->
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef>Category</th>
+      <td mat-cell *matCellDef="let ingredients">{{ingredients.category}}</td>
+    </ng-container>
+
+    <!-- Unit Coloumn -->
+    <ng-container matColumnDef="unit">
+      <th mat-header-cell *matHeaderCellDef>Unit</th>
+      <td mat-cell *matCellDef="let ingredients">{{ingredients.baseUnit}}</td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let ingredients">
+        <button mat-icon-button color="primary" (click)="openEdit(ingredients)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="delete(ingredients._id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+ <!-- <mat-paginator
+  [length]="pagination.totalItems"
+  [pageSize]="pagination.itemsPerPage"
+  [pageIndex]="pagination.currentPage - 1"
+  (page)="pageChanged($event)">
+</mat-paginator> -->
+</div>
+

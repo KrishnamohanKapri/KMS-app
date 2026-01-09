@@ -1,0 +1,81 @@
+.add-batch-container {
+	width: 800px;
+	height: 800px;
+	margin: 2.5rem auto;
+	padding: 2.2rem 2rem 1.5rem 2rem;
+	background: #fff;
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.13);
+	border-radius: 16px;
+	font-family: 'Roboto', sans-serif;
+	border: 1px solid #e0e0e0;
+	overflow-y: auto;
+}
+
+h2 {
+	text-align: center;
+	margin-bottom: 2rem;
+	color: #00796b;
+	font-size: 2rem;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+}
+
+.full-width {
+	width: 100%;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.2rem;
+}
+
+mat-form-field.full-width {
+	margin-bottom: 0.5rem;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 1rem;
+	margin-top: 1.5rem;
+}
+
+button[mat-raised-button] {
+	text-transform: none;
+	font-weight: 500;
+	border-radius: 8px;
+	min-width: 120px;
+	font-size: 1rem;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+button[mat-raised-button][color="primary"] {
+	background: linear-gradient(90deg, #009688 0%, #43cea2 100%);
+	color: #fff;
+}
+
+button[mat-raised-button][color="primary"]:hover {
+	background: linear-gradient(90deg, #00796b 0%, #43cea2 100%);
+}
+
+button[mat-raised-button][color="warn"] {
+	background: #f44336;
+	color: #fff;
+}
+
+@media (max-width: 600px) {
+	.add-batch-container {
+		margin: 1rem 0.2rem;
+		padding: 1rem 0.5rem;
+		border-radius: 10px;
+	}
+	h2 {
+		font-size: 1.2rem;
+		margin-bottom: 1rem;
+	}
+	button[mat-raised-button] {
+		min-width: 90px;
+		font-size: 0.95rem;
+	}
+}

@@ -1,0 +1,27 @@
+  <h2 mat-dialog-title>{{ data.mode === 'edit' ? 'Edit Kitchen Rules' : 'Add Kitchen Rules' }}</h2>
+  
+  <div>
+    <ol>
+      <li *ngFor="let step of rules; let j = index">
+        <span *ngIf="!step.editing" [class.done]="step.done" (click)="startEditStep(step)">
+          {{ step.text }}
+        </span>
+        <input *ngIf="step.editing" [(ngModel)]="step.text"
+               (blur)="saveStep(step)" (keyup.enter)="saveStep(step)" />
+        <button (click)="deleteStep(j)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </li>
+    </ol>
+    <button (click)="addStep()" mat-raised-button color="accent">
+      <mat-icon>add</mat-icon> Add Step
+    </button>
+  </div>
+
+  
+  <div class="full-width" style="display: flex; justify-content: flex-end; gap: 1rem;">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary" (click)="addKitchenRule()">
+      Save Changes
+    </button>
+  </div>

@@ -1,0 +1,32 @@
+const auth = require("./auth");
+const newsletter = require("./newsletter");
+const meals = require("./meals");
+const chef = require("./chef");
+const order = require("./order");
+const notification = require("./notification");
+const dashboard = require("./dashboard");
+const normalizedEntities = require("./normalizedEntities");
+const ingredientStock = require("./ingredientStock");
+const mealPlan = require("./mealPlan");
+const orderHistory = require("./orderHistory");
+const customer = require("./customer");
+const payment = require("./payment");
+const kitchenRules = require("./kitchenRules");
+const router = require("express").Router();
+
+router.use("/auth", auth);
+router.use("/newsletter", newsletter);
+router.use("/meals", meals);
+router.use("/chef", chef);
+router.use("/order", order);
+router.use("/notification", notification);
+router.use("/dashboard", dashboard);
+router.use("/entities", normalizedEntities);
+router.use("/stock", ingredientStock);
+router.use("/planning", mealPlan);
+router.use("/history", orderHistory);
+router.use("/customer", customer);
+router.use("/payment", payment);
+router.use("/kitchen-rules", kitchenRules);
+
+module.exports = router;

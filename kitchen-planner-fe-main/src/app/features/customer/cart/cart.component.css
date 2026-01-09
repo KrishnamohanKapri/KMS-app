@@ -1,0 +1,341 @@
+/* Container */
+.cart-page {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Headings */
+h2, h3 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* Empty cart message */
+.empty-cart {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+  margin-bottom: 2rem;
+}
+
+/* Cart Actions */
+.cart-actions {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.clear-btn {
+  background-color: #ff7043;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.clear-btn:hover {
+  background-color: #d84315;
+}
+
+/* Cart Item Cards */
+.cart-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.cart-card:hover {
+  transform: translateY(-2px);
+}
+
+.cart-item-image img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 1rem;
+}
+
+.cart-item-image .placeholder-img {
+  width: 80px;
+  height: 80px;
+  background-color: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #777;
+  border-radius: 8px;
+  margin-right: 1rem;
+}
+
+.cart-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cart-info h4 {
+  margin: 0;
+  color: #222;
+}
+
+.cart-info p {
+  margin: 4px 0;
+  color: #555;
+}
+
+/* Remove button */
+.remove-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.remove-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Add More Items Section */
+.add-section {
+  margin-top: 2rem;
+  background: #fdfdfd;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+/* Horizontal scrollable meal cards */
+.meal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.meal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.meal-scroll::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+/* Horizontal meal card */
+.meal-card-horizontal {
+  flex: 0 0 180px;
+  background: #fafafa;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.meal-card-horizontal:hover {
+  transform: translateY(-3px);
+}
+
+.meal-card-horizontal img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+/* Info section inside horizontal card */
+.meal-info-horizontal {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.meal-info-horizontal h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #222;
+  line-height: 1.2rem;
+  min-height: 2.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meal-price {
+  font-weight: 600;
+  color: #004d40;
+}
+
+.meal-servings {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.meal-action-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+}
+
+.meal-action-horizontal input {
+  width: 50px;
+  padding: 0.25rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Add / Next buttons */
+.add-btn,
+.next-btn {
+  background-color: #004d40;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-btn:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.add-btn:hover:not(:disabled),
+.next-btn:hover {
+  background-color: #00332d;
+}
+
+/* Summary Card */
+.summary-card {
+  background: #f1f8e9;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.summary-card h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #33691e;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #1b5e20;
+  border-top: 1px dashed #c5e1a5;
+  padding-top: 0.5rem;
+}
+
+.next-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  background-color: #33691e;
+  color: #fff;
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.next-btn:hover {
+  background-color: #1b5e20;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .meal-scroll {
+    gap: 0.6rem;
+  }
+
+  .meal-card-horizontal {
+    flex: 0 0 140px;
+  }
+
+  .cart-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .remove-btn {
+    margin-top: 0.5rem;
+  }
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.quantity-controls button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background-color: #004d40;
+  color: white;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.quantity-controls button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.quantity-controls button:hover:not(:disabled) {
+  background-color: #00332d;
+}
+
+.quantity-controls span {
+  min-width: 24px;
+  text-align: center;
+  font-weight: 500;
+}
+

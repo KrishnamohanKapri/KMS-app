@@ -1,0 +1,226 @@
+/* ============= SIDEBAR CONTAINER ============= */
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 250px;
+  padding: 1.5rem 1rem;
+  background-color: #00695c;
+  /* Dark teal sidebar */
+  color: #fff;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav .brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #fff;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ============= MENU ITEMS ============= */
+.menu-item {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #cfd8dc;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.menu-item:hover,
+.menu-item.active {
+  background-color: #004d40;
+  color: #fff;
+}
+
+/* ============= STOCK ACCORDION ============= */
+::ng-deep .stock-accordion .mat-expansion-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Header default */
+::ng-deep .stock-accordion .mat-expansion-panel-header {
+  padding: 0.5rem 0.75rem;
+  background-color: transparent !important;
+  border-radius: 6px;
+  color: #cfd8dc !important;
+  font-weight: 500;
+}
+
+/* Header title */
+::ng-deep .stock-accordion .mat-expansion-panel-header .mat-panel-title {
+  color: #cfd8dc !important;
+  font-weight: 500;
+}
+
+/* Hover & expanded state */
+::ng-deep .stock-accordion .mat-expansion-panel-header:hover,
+::ng-deep .stock-accordion .mat-expansion-panel-header.mat-expanded {
+  background-color: #004d40 !important;
+  color: #fff !important;
+}
+
+/* Header title inside hover/expanded */
+::ng-deep .stock-accordion .mat-expansion-panel-header:hover .mat-panel-title,
+::ng-deep .stock-accordion .mat-expansion-panel-header.mat-expanded .mat-panel-title {
+  color: #fff !important;
+}
+
+/* Panel body */
+::ng-deep .stock-accordion .mat-expansion-panel-content,
+::ng-deep .stock-accordion .mat-expansion-panel-body {
+  background: transparent !important;
+  padding-left: 0.75rem;
+}
+
+/* ============= SUBMENU ITEMS ============= */
+.sub-item {
+  display: block;
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #b2dfdb;
+  /* light teal-ish text */
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.sub-item:hover,
+.sub-item.active {
+  background-color: #004d40;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ============= MAIN CONTENT ============= */
+.main-content {
+  padding: 2rem;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* ============= LOGOUT ============= */
+.logout {
+  margin-top: auto;
+  color: #ff6b6b;
+  /* red logout */
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background-color: #ff6b6b;
+  color: #fff;
+}
+
+.stock-accordion .mat-expansion-panel {
+  background: transparent !important;
+  color: #cfd8dc;
+  /* same as other menu items */
+  box-shadow: none !important;
+}
+
+.stock-accordion .mat-expansion-panel-header {
+   padding: 0.5rem 0.75rem;
+  background-color: transparent !important;
+  border-radius: 6px;
+  color: #cfd8dc !important;
+  font-weight: 500;
+}
+
+.stock-accordion .mat-expansion-panel-header:hover,
+.stock-accordion .mat-expansion-panel-header.mat-expanded {
+  background-color: #004d40 !important;
+  color: #cfd8dc !important;
+  /* ✅ white when hovered or expanded */
+}
+
+/* remove Angular Material default background */
+.stock-accordion .mat-expansion-panel-content {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.stock-accordion .mat-expansion-panel-body {
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  background-color: transparent !important;
+}
+
+/* Submenu links */
+.sub-item {
+  display: block;
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #b2dfdb;
+  /* light teal-ish text */
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.sub-item:hover {
+  color: #fff;
+  background-color: #004d40;
+}
+
+.sub-item.active {
+  color: #fff;
+  font-weight: 600;
+  background-color: #004d40;
+}
+
+.mat-expansion-panel-header-title {
+  color: #cfd8dc;
+}
+
+/* Highlight parent when submenu active */
+.stock-accordion .mat-expansion-panel-header.mat-expanded {
+  background-color: #004d40 !important;
+  color: #cfd8dc !important;
+}
+
+/* Submenu links */
+.sub-item {
+  display: block;
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #b2dfdb;
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.sub-item:hover {
+  color: #fff;
+  background-color: #004d40;
+}
+
+.sub-item.active {
+  color: #fff;
+  font-weight: 600;
+  background-color: #004d40;
+}
+
+/* Highlight parent when submenu active */
+.stock-accordion .mat-expansion-panel-header.mat-expanded {
+  background-color: #004d40 !important;
+  color: #fff !important;
+}

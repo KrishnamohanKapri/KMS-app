@@ -1,0 +1,86 @@
+<!-- <app-navbar></app-navbar> -->
+
+<div class="profile-container">
+  <h2>Delivery Address Information</h2>
+  <form [formGroup]="deliveryForm" (ngSubmit)="submitDeliveryInfo()">
+    <div class="same-billing-card" (click)="toggleSameAsBillingForm()">
+  <mat-icon class="home-icon">home</mat-icon>
+  <div class="billing-text">
+    <h3>Same as Billing Address</h3>
+    <p>Click to auto-fill your delivery address</p>
+  </div>
+  <mat-checkbox
+    [checked]="sameAsBilling"
+    (change)="toggleSameAsBilling($event)"
+    class="big-checkbox">
+  </mat-checkbox>
+</div>
+
+    <!-- Street & House Number -->
+    <div class="form-section form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Street</mat-label>
+        <input matInput formControlName="street" required>
+        <mat-error *ngIf="f['street'].touched && f['street'].invalid">Street is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>House #</mat-label>
+        <input matInput formControlName="hausnumber" required>
+        <mat-error *ngIf="f['hausnumber'].touched && f['hausnumber'].invalid">House number is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Postal code & City -->
+    <div class="form-section form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Postal Code</mat-label>
+        <input matInput formControlName="zipCode" required>
+        <mat-error *ngIf="f['zipCode'].touched && f['zipCode'].invalid">Postal code is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>City</mat-label>
+        <input matInput formControlName="city" required>
+        <mat-error *ngIf="f['city'].touched && f['city'].invalid">City is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- State & Country -->
+    <div class="form-section form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>State</mat-label>
+        <input matInput formControlName="state" required>
+        <mat-error *ngIf="f['state'].touched && f['state'].invalid">State is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Country</mat-label>
+        <mat-select formControlName="country" required>
+          <mat-option *ngFor="let c of countriesList" [value]="c">{{ c }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="f['country'].touched && f['country'].invalid">Country is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Instructions -->
+    <div class="form-section form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Instructions</mat-label>
+        <input matInput formControlName="instructions">
+      </mat-form-field>
+    </div>
+    <div class="form-section form-row">
+      <!-- Make Special Instructions full width -->
+      <mat-form-field appearance="outline" class="full-width special-instructions">
+        <mat-label>Special Instructions</mat-label>
+        <textarea matInput formControlName="specialInstructions" rows="4"
+          placeholder="E.g., Leave the package at the back door or call upon arrival"></textarea>
+        <mat-hint>Optional: Provide any specific guidance for delivery</mat-hint>
+      </mat-form-field>
+    </div>
+    <div class="form-actions">
+      <button type="submit" [disabled]="deliveryForm.invalid" class="next-btn">Proceed to Payment</button>
+    </div>
+  </form>
+</div>

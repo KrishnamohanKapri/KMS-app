@@ -1,0 +1,184 @@
+/* ---------------- Navbar ---------------- */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: linear-gradient(135deg, #ffffff, #f8fff9);
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  height: 78px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Center Logo */
+.navbar-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.navbar-logo .logo {
+  height: 48px;
+}
+.navbar-logo .app-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+/* Spacer */
+.spacer {
+  flex: 1;
+}
+
+/* Right Section */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navbar buttons */
+.navbar-right button.mat-button,
+.navbar-right button.mat-icon-button {
+  color: #2e7d32;
+  font-weight: 500;
+  border-radius: 40px;
+  padding: 6px 14px;
+  transition: all 0.3s ease;
+}
+.navbar-right button.mat-button:hover,
+.navbar-right button.mat-icon-button:hover {
+  background: rgba(67,160,71,0.08);
+  transform: translateY(-2px);
+}
+
+/* Cart Badge */
+.cart-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #e53935;
+  color: #fff;
+  border-radius: 50%;
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Notification Badge */
+.badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #ffb300;
+  color: #fff;
+  font-size: 10px;
+  border-radius: 50%;
+  padding: 2px 6px;
+}
+
+/* ---------------- User Dropdown ---------------- */
+.user-menu-panel {
+  min-width: 260px;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15) !important;
+  padding: 6px 0;
+}
+
+/* Header with Avatar */
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.user-header .avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #43a047;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-header .user-info {
+  display: flex;
+  flex-direction: column;
+}
+.user-header .user-info strong {
+  font-size: 15px;
+  color: #333;
+}
+.user-header .user-info small {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Menu Items */
+.user-menu-panel .mat-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin: 2px 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333 !important;
+  transition: all 0.25s ease;
+}
+.user-menu-panel .mat-menu-item mat-icon {
+  font-size: 20px;
+  color: #43a047;
+}
+
+/* Hover Effect */
+.user-menu-panel .mat-menu-item:hover {
+  background: rgba(67, 160, 71, 0.08);
+  transform: translateX(4px);
+}
+
+/* Divider */
+.user-menu-panel .mat-divider {
+  margin: 6px 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Logout */
+.user-menu-panel .logout {
+  color: #e53935 !important;
+  font-weight: 600;
+}
+.user-menu-panel .logout mat-icon {
+  color: #e53935 !important;
+}
+.user-menu-panel .logout:hover {
+  background: rgba(229, 57, 53, 0.08);
+  transform: translateX(4px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-logo {
+    position: relative;
+    left: auto;
+    transform: none;
+  }
+}

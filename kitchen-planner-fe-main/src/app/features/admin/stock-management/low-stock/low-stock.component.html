@@ -1,0 +1,54 @@
+<div class="page-container">
+  <h2>Low Stock</h2>
+
+  <div *ngIf="lowStockItems.length === 0" class="empty-msg">
+    ✅ No items are running low
+  </div>
+
+  <div *ngIf="lowStockItems.length > 0" class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Ingredient</th>
+          <th>Category</th>
+          <th>Stock</th>
+          <th>Reorder Level</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of pagedItems">
+          <tr (click)="item.expanded = !item.expanded">
+            <td>{{item.name}}</td>
+            <td>{{item.category | titlecase}}</td>
+            <td><span class="warning">{{item.stock}}</span></td>
+            <td>{{item.reorderLevel}}</td>
+            <td>
+              <button mat-button color="primary" (click)="$event.stopPropagation(); item.expanded = !item.expanded">
+                {{item.expanded ? 'Hide' : 'Details'}}
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="item.expanded" class="expand-row">
+            <td colspan="5">
+              <div class="details">
+                <p><strong>Description:</strong> {{item.description}}</p>
+                <p><strong>Packaging:</strong> {{item.packagingQuantity}} {{item.packagingUnit}} ({{item.baseUnit}})</p>
+                <p><strong>Display Unit:</strong> {{item.displayUnit}}</p>
+                <p><strong>Cost per Package:</strong> {{item.costPerPackage | currency:'EUR':'symbol':'1.2-2'}}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <mat-paginator
+      [length]="lowStockItems.length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
+</div>
+

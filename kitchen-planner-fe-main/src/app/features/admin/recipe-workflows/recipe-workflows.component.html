@@ -1,0 +1,43 @@
+<div class="workflow-container">
+  <h2>Recipe Workflows</h2>
+
+  <!-- Recipe Selector -->
+  <div class="recipe-selector">
+    <label for="recipeDropdown" class="dropdown-label">Select Recipe:</label>
+    <div class="dropdown-wrapper">
+      <select id="recipeDropdown" [(ngModel)]="selectedRecipeIndex" class="styled-dropdown">
+        <option *ngFor="let recipe of recipes; let i = index" [value]="i">
+          {{ recipe.title }}
+        </option>
+      </select>
+      <span class="dropdown-arrow">&#9662;</span>
+    </div>
+    <button *ngIf="role === 'admin'" (click)="addRecipe()" mat-raised-button color="primary">
+      <mat-icon>add</mat-icon> Add Recipe
+    </button>
+    <button *ngIf="role === 'admin' && recipes.length > 0" (click)="deleteRecipe()" mat-raised-button color="warn">
+      <mat-icon>delete</mat-icon> Delete Recipe
+    </button>
+  </div>
+
+  <!-- Steps for Selected Recipe -->
+  <div *ngIf="recipes.length > 0">
+    <h3>{{ recipes[selectedRecipeIndex]?.title }}</h3>
+    <ol>
+      <li *ngFor="let step of recipes[selectedRecipeIndex]?.steps; let j = index">
+        <input type="checkbox" [(ngModel)]="step.done" [disabled]="role !== 'chef' ? false : false" />
+        <span *ngIf="!step.editing" [class.done]="step.done" (click)="startEditStep(step)">
+          {{ step.text }}
+        </span>
+        <input *ngIf="step.editing" [(ngModel)]="step.text"
+               (blur)="saveStep(step)" (keyup.enter)="saveStep(step)" />
+        <button *ngIf="role === 'admin'" (click)="deleteStep(j)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </li>
+    </ol>
+    <button *ngIf="role === 'admin'" (click)="addStep()" mat-raised-button color="accent">
+      <mat-icon>add</mat-icon> Add Step
+    </button>
+  </div>
+</div>

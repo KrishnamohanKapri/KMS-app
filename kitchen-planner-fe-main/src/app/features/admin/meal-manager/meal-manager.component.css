@@ -1,0 +1,62 @@
+.meals-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #00796b;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.search-field {
+  flex: 1;
+}
+
+/* Table base style like Weekly Meal Plans */
+table.mat-elevation-z8 {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mat-header-cell,
+.mat-cell {
+  padding: 8px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th.mat-header-cell {
+  font-weight: 600;
+}
+
+/* Match Weekly Meal Plans button style */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.action-buttons button:hover {
+  background-color: #005b4f;
+}

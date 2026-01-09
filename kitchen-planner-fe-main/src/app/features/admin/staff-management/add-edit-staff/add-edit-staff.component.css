@@ -1,0 +1,52 @@
+.staff-page {
+  width: 85%;            /* span most of the screen */
+  max-width: 1500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #00695c;
+  text-align: center;
+}
+
+/* Single-column form styling */
+.staff-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-slide-toggle {
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+button[mat-button] {
+  color: #757575;
+}
+
+button[mat-raised-button] {
+  min-width: 140px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}

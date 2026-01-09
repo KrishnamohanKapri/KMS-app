@@ -1,0 +1,120 @@
+.orders-container {
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 1rem;
+  background: #e3f2fd;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #1565c0;
+}
+
+.order-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.order-header h3 {
+  margin: 0;
+}
+
+.order-total {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.order-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.order-body h4 {
+  margin-bottom: 0.5rem;
+  color: #37474f;
+}
+
+.meals ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.meals li {
+  margin-bottom: 0.3rem;
+}
+
+.qty {
+  font-weight: bold;
+  color: #f57c00;
+}
+
+.totals p {
+  margin: 0.3rem 0;
+}
+
+.final-total {
+  font-size: 1.1rem;
+  color: #2e7d32;
+}
+
+.order-footer {
+  border-top: 1px solid #eee;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #616161;
+}
+
+.pending {
+  color: #f57c00;
+  font-weight: 600;
+}
+.delivered {
+  color: #2e7d32;
+  font-weight: 600;
+}
+.cancelled {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.confirmed {
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.ready {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.preparing {
+  color: #f9a825;
+  font-weight: 600;
+}
+
+mat-paginator {
+  margin-top: 1rem;
+}

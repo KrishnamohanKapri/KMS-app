@@ -1,0 +1,244 @@
+@startuml KMS_Complete_Schema
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) <i>x</i>
+!define required(x) <b>x</b>
+!define optional(x) x
+
+title Kitchen Management System (KMS) - Complete Database Schema\n\n<size:14>Normalized Architecture with Advanced Features</size>
+
+' User Management
+class User {
+  +_id : ObjectId
+  +firstName : String
+  +lastName : String
+  +email : String
+  +password : String
+  +role : String
+  +profileImage : String
+  +isActive : Boolean
+  +status : String
+  +kitchenNo : String
+  +createdAt : Date
+}
+note right of User : Core user entity with authentication and role-based access control
+
+class Attendance {
+  +_id : ObjectId
+  +user : ObjectId
+  +date : Date
+  +isPresent : Boolean
+  +createdAt : Date
+  +updatedAt : Date
+}
+note right of Attendance : Tracks staff attendance for meal planning
+
+' Newsletter
+class Newsletter {
+  +_id : ObjectId
+  +email : String
+  +isSubscribed : Boolean
+  +createdAt : Date
+}
+
+' Meals & Categories
+class Category {
+  +_id : ObjectId
+  +name : String
+  +description : String
+  +createdAt : Date
+}
+class Meal {
+  +_id : ObjectId
+  +title : String
+  +description : String
+  +servings : Number
+  +price : Number
+  +category : ObjectId
+  +images : [String]
+  +isActive : Boolean
+  +nutritionalInfo : ObjectId
+  +dietaryInfo : ObjectId
+  +createdAt : Date
+  +updatedAt : Date
+}
+
+' Nutritional & Dietary
+class NutritionalInfo {
+  +_id : ObjectId
+  +calories : Number
+  +protein : Number
+  +carbohydrates : Number
+  +fat : Number
+  +fiber : Number
+  +sugar : Number
+  +sodium : Number
+  +createdAt : Date
+  +updatedAt : Date
+}
+class DietaryInfo {
+  +_id : ObjectId
+  +isVegetarian : Boolean
+  +isVegan : Boolean
+  +isGlutenFree : Boolean
+  +isDairyFree : Boolean
+  +isNutFree : Boolean
+  +isHalal : Boolean
+  +isKosher : Boolean
+  +createdAt : Date
+  +updatedAt : Date
+}
+
+' Allergens
+class Allergen {
+  +_id : ObjectId
+  +name : String
+  +description : String
+  +createdAt : Date
+}
+class MealAllergen {
+  +_id : ObjectId
+  +mealId : ObjectId
+  +allergenId : ObjectId
+  +createdAt : Date
+}
+
+' Ingredients & Stock
+class Ingredient {
+  +_id : ObjectId
+  +name : String
+  +description : String
+  +category : String
+  +stock : Number
+  +baseUnit : String
+  +packagingUnit : String
+  +packagingQuantity : Number
+  +costPerPackage : Number
+  +reorderLevel : Number
+  +isActive : Boolean
+  +unit : String
+  +costPerUnit : Number
+  +createdAt : Date
+  +updatedAt : Date
+}
+class IngredientBatch {
+  +_id : ObjectId
+  +ingredientId : ObjectId
+  +packageQuantity : Number
+  +baseUnitQuantity : Number
+  +expiryDate : Date
+  +receivedDate : Date
+  +batchNumber : String
+  +costPerPackage : Number
+  +supplier : String
+  +purchaseOrder : String
+  +createdAt : Date
+  +updatedAt : Date
+}
+class MealIngredient {
+  +_id : ObjectId
+  +mealId : ObjectId
+  +ingredientId : ObjectId
+  +quantity : Number
+  +unit : String
+  +createdAt : Date
+}
+
+' Tags
+class Tag {
+  +_id : ObjectId
+  +name : String
+  +description : String
+  +createdAt : Date
+}
+class MealTag {
+  +_id : ObjectId
+  +mealId : ObjectId
+  +tagId : ObjectId
+  +createdAt : Date
+}
+
+' Meal Planning
+class MealPlan {
+  +_id : ObjectId
+  +date : Date
+  +startDate : Date   ' Start of the plan (for week/multi-day)
+  +endDate : Date     ' End of the plan (for week/multi-day)
+  +meals : [Object]
+  +type : String
+  +createdBy : ObjectId
+  +assignedStaff : [ObjectId]
+  +notes : String
+  +createdAt : Date
+  +updatedAt : Date
+}
+
+' Orders & Order History
+class Order {
+  +_id : ObjectId
+  +userId : ObjectId
+  +items : [Object]
+  +totalAmount : Number
+  +status : String
+  +paymentStatus : String
+  +billingInfo : Object
+  +createdAt : Date
+  +updatedAt : Date
+}
+class OrderHistory {
+  +_id : ObjectId
+  +orderId : ObjectId
+  +userId : ObjectId
+  +status : String
+  +previousStatus : String
+  +orderNumber : String
+  +totalAmount : Number
+  +changedBy : ObjectId
+  +notes : String
+  +changedAt : Date
+  +createdAt : Date
+  +updatedAt : Date
+}
+
+' Notifications
+class Notification {
+  +_id : ObjectId
+  +userId : ObjectId
+  +title : String
+  +message : String
+  +type : String
+  +isRead : Boolean
+  +createdAt : Date
+  +updatedAt : Date
+}
+
+' =========================
+' RELATIONSHIPS
+' =========================
+
+User \"1\" -- \"*\" Attendance : has
+User \"1\" -- \"*\" Order : places
+User \"1\" -- \"*\" Notification : receives
+User \"1\" -- \"*\" MealPlan : creates
+User \"1\" -- \"*\" MealPlan : assigned_to
+
+Category \"1\" -- \"*\" Meal : categorizes
+Meal \"1\" -- \"1\" NutritionalInfo : has
+Meal \"1\" -- \"1\" DietaryInfo : has
+
+Meal \"1\" -- \"*\" MealAllergen : has
+Allergen \"1\" -- \"*\" MealAllergen : belongs_to
+
+Meal \"1\" -- \"*\" MealIngredient : contains
+Ingredient \"1\" -- \"*\" MealIngredient : used_in
+Ingredient \"1\" -- \"*\" IngredientBatch : has_batches
+
+Meal \"1\" -- \"*\" MealTag : tagged_with
+Tag \"1\" -- \"*\" MealTag : applied_to
+
+Meal \"1\" -- \"*\" MealPlan : planned_in
+Meal \"1\" -- \"*\" Order : ordered_in
+
+Order \"1\" -- \"*\" OrderHistory : audit_trail
+
+@enduml 

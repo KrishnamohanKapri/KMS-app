@@ -1,0 +1,182 @@
+<h2 class="dashboard-title">Welcome, Admin!</h2>
+
+<div class="stats-grid">
+
+  <!-- Total Earnings -->
+  <mat-card class="stat-card earnings">
+    <div class="stat-icon"><mat-icon>attach_money</mat-icon></div>
+    <div class="stat-content">
+      <h3>
+        {{ dashboardStats.totalEarnings | currency:'EUR':'symbol':'1.2-2' }}
+        <span class="trend" [ngClass]="dashboardStats.earningsTrend >= 0 ? 'up' : 'down'">
+          <mat-icon>{{ dashboardStats.earningsTrend >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ dashboardStats.earningsTrend | number:'1.0-1' }}%
+        </span>
+      </h3>
+      <p>Total Earnings</p>
+      <mat-progress-bar
+        [value]="dashboardStats.earningsProgress"
+        color="primary"
+        mode="determinate">
+      </mat-progress-bar>
+    </div>
+  </mat-card>
+
+  <!-- Total Orders -->
+  <mat-card class="stat-card orders">
+    <div class="stat-icon"><mat-icon>shopping_cart</mat-icon></div>
+    <div class="stat-content">
+      <h3>
+        {{ dashboardStats.totalOrders }}
+        <span class="trend" [ngClass]="dashboardStats.ordersTrend >= 0 ? 'up' : 'down'">
+          <mat-icon>{{ dashboardStats.ordersTrend >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ dashboardStats.ordersTrend | number:'1.0-1' }}%
+        </span>
+      </h3>
+      <p>Total Orders</p>
+      <mat-progress-bar
+        [value]="dashboardStats.ordersProgress"
+        color="accent"
+        mode="determinate">
+      </mat-progress-bar>
+    </div>
+  </mat-card>
+
+  <!-- Total Customers -->
+  <mat-card class="stat-card customers">
+    <div class="stat-icon"><mat-icon>people</mat-icon></div>
+    <div class="stat-content">
+      <h3>
+        {{ dashboardStats.totalCustomers }}
+        <span class="trend" [ngClass]="dashboardStats.customersTrend >= 0 ? 'up' : 'down'">
+          <mat-icon>{{ dashboardStats.customersTrend >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ dashboardStats.customersTrend | number:'1.0-1' }}%
+        </span>
+      </h3>
+      <p>Total Customers</p>
+      <mat-progress-bar
+        [value]="dashboardStats.customersProgress"
+        color="warn"
+        mode="determinate">
+      </mat-progress-bar>
+    </div>
+  </mat-card>
+
+  <!-- Total Chefs -->
+  <mat-card class="stat-card chefs">
+    <div class="stat-icon"><mat-icon>restaurant</mat-icon></div>
+    <div class="stat-content">
+      <h3>
+        {{ dashboardStats.totalChefs }}
+        <span class="trend" [ngClass]="dashboardStats.chefsTrend >= 0 ? 'up' : 'down'">
+          <mat-icon>{{ dashboardStats.chefsTrend >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+          {{ dashboardStats.chefsTrend | number:'1.0-1' }}%
+        </span>
+      </h3>
+      <p>Total Chefs</p>
+      <mat-progress-bar
+        [value]="dashboardStats.chefsProgress"
+        color="primary"
+        mode="determinate">
+      </mat-progress-bar>
+    </div>
+  </mat-card>
+
+</div>
+
+<div class="section-title">Customer Statistics</div>
+<div class="stats-grid">
+  <!-- Active Customers -->
+  <mat-card class="stat-card active">
+    <div class="stat-icon">
+      <mat-icon>person</mat-icon>
+    </div>
+    <div class="stat-content">
+      <h3>{{ customerStats.activeCustomers }}</h3>
+      <p>Active Customers</p>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="(customerStats.activeCustomers / customerStats.totalCustomers) * 100"
+        color="primary">
+      </mat-progress-bar>
+    </div>
+  </mat-card>
+
+  <!-- Inactive Customers -->
+  <mat-card class="stat-card inactive">
+    <div class="stat-icon">
+      <mat-icon>person_off</mat-icon>
+    </div>
+    <div class="stat-content">
+      <h3>{{ customerStats.inactiveCustomers }}</h3>
+      <p>Inactive Customers</p>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="(customerStats.inactiveCustomers / customerStats.totalCustomers) * 100"
+        color="warn">
+      </mat-progress-bar>
+    </div>
+  </mat-card>
+
+  <!-- Suspended Customers -->
+  <mat-card class="stat-card suspended">
+    <div class="stat-icon">
+      <mat-icon>block</mat-icon>
+    </div>
+    <div class="stat-content">
+      <h3>{{ customerStats.suspendedCustomers }}</h3>
+      <p>Suspended Customers</p>
+    </div>
+  </mat-card>
+
+  <!-- Loyalty Points -->
+  <mat-card class="stat-card points">
+    <div class="stat-icon">
+      <mat-icon>star</mat-icon>
+    </div>
+    <div class="stat-content">
+      <h3>{{ customerStats.totalLoyaltyPoints }}</h3>
+      <p>Total Loyalty Points</p>
+    </div>
+  </mat-card>
+
+  <!-- Total Spent -->
+  <mat-card class="stat-card money">
+    <div class="stat-icon">
+      <mat-icon>attach_money</mat-icon>
+    </div>
+    <div class="stat-content">
+      <h3>{{ customerStats.totalSpent | currency:'EUR':'symbol':'1.2-2' }}</h3>
+      <p>Total Spent</p>
+    </div>
+  </mat-card>
+
+  <!-- Average Spent -->
+  <mat-card class="stat-card avg">
+    <div class="stat-icon">
+      <mat-icon>trending_up</mat-icon>
+    </div>
+    <div class="stat-content">
+      <h3>{{ customerStats.averageSpent | currency:'EUR':'symbol':'1.2-2' }}</h3>
+      <p>Average Spent</p>
+    </div>
+  </mat-card>
+</div>
+
+
+<!-- Charts Section -->
+<div class="charts-section">
+  <h3>Income Statistics</h3>
+  <canvas baseChart
+    [data]="incomeChartData"
+    [options]="chartOptions"
+    chartType="line">
+  </canvas>
+
+  <h3>Order Statistics</h3>
+  <canvas baseChart
+    [data]="orderChartData"
+    [options]="chartOptions"
+    chartType="line">
+  </canvas>
+</div>

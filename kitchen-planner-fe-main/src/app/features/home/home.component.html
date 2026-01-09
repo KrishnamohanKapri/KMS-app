@@ -1,0 +1,114 @@
+<app-navbar></app-navbar>
+
+<!-- Hero Slider -->
+<div class="hero-slider">
+  <div class="slides" [style.transform]="'translateX(-' + currentSlide * 100 + '%)'">
+    <div class="slide" *ngFor="let slide of heroSlides">
+      <img [src]="slide.image" [alt]="slide.title" />
+      <div class="hero-caption">
+        <h2>{{ slide.title }}</h2>
+        <p>{{ slide.subtitle }}</p>
+        <button mat-raised-button color="accent" routerLink="/customer/meals-dashboard">
+          Browse Meals
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="slider-controls">
+    <span *ngFor="let slide of heroSlides; let i = index" (click)="goToSlide(i)"
+      [class.active]="i === currentSlide"></span>
+  </div>
+</div>
+
+<!-- Featured Meals -->
+<section class="meal-section">
+  <h2>Featured Meals</h2>
+  <div class="meal-grid">
+    <mat-card *ngFor="let meal of meals" class="meal-card">
+      <div class="meal-image-wrapper">
+        <img mat-card-image [src]="meal.image" [alt]="meal.title" />
+
+        <!-- Overlay if meal is not available -->
+        <div *ngIf="!isMealAvailable(meal)" class="overlay">
+          <mat-icon class="overlay-icon">schedule</mat-icon>
+          <span>Not Available Now</span>
+          <small>Available {{ meal.servingStart }} - {{ meal.servingEnd }}</small>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags-container" *ngIf="meal.tags?.length">
+          <span *ngFor="let tag of meal.tags" class="meal-tag" [ngStyle]="getTagStyle(tag)">
+            {{ tag }}
+          </span>
+        </div>
+      </div>
+
+      <mat-card-content class="meal-details">
+        <h3>
+          <a [routerLink]="['/customer/meal', meal.id]" class="meal-link">{{ meal.title }}</a>
+        </h3>
+
+        <p>{{ meal.description }}</p>
+        <div class="meal-info">
+          <span class="price">💶 {{ meal.price | currency:'EUR':'symbol':'1.2-2' }}</span>
+          <span class="servings">🍽️ {{ meal.servings }} servings</span>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="center-button">
+        <button mat-raised-button color="accent" [disabled]="!isMealAvailable(meal)" (click)="addToCart(meal)">
+          <mat-icon>add_shopping_cart</mat-icon> Add to Cart
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</section>
+
+
+<!-- Newsletter -->
+<section class="newsletter-section">
+  <div class="newsletter-card">
+    <h2>📧 Stay Updated!</h2>
+    <p>Get new meals, offers, and events straight to your inbox.</p>
+    <form class="newsletter-form" (ngSubmit)="subscribeNewsletter()">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>First Name</mat-label>
+          <input matInput [(ngModel)]="subscriber.firstName" name="firstName" required />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Last Name</mat-label>
+          <input matInput [(ngModel)]="subscriber.lastName" name="lastName" required />
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" [(ngModel)]="subscriber.email" name="email" required />
+      </mat-form-field>
+      <button mat-raised-button type="submit" class="subscribe-btn">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<!-- Info Section -->
+<section class="info-section">
+  <div class="info-box">
+    <h3>📍 Our Location</h3>
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12045.859631151767!2d10.924002311958232!3d50.68164137773164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a46399f367239f%3A0x15934f9a55b91890!2sIlmenau%2C%20Germany!5e0!3m2!1sen!2sde!4v1700000000000"
+      width="100%" height="250" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+  </div>
+
+  <div class="info-box">
+    <h3>🕒 Opening Hours</h3>
+    <p>Mon - Fri: 10:00 AM – 8:00 PM</p>
+    <p>Sat - Sun: 11:00 AM – 6:00 PM</p>
+  </div>
+
+  <div class="info-box">
+    <h3>📞 Contact</h3>
+    <p>Email: support&#64;kitchenplanner.com</p>
+    <p>Phone: +49 123 456 789</p>
+  </div>
+</section>

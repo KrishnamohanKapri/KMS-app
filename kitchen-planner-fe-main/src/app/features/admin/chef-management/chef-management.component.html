@@ -1,0 +1,46 @@
+<div class="order-list-container">
+    <h2>Users</h2>
+  
+    <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="Search by name or email" />
+  
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Kitchen</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let chef of filterChefs">
+          <td>{{ chef.firstName }} {{ chef.lastName }}</td>
+          <td>{{ chef.email }}</td>
+          <td>{{ chef.status }}</td>
+          <td>{{ chef.createdAt | date:'short' }}</td>
+          <td>{{ chef.kitchenNo }}</td>
+          <td>
+            <button 
+              [ngClass]="chef.isActive ? 'deactivate-btn' : 'activate-btn'" 
+              (click)="toggleActive(chef)">
+              {{ chef.isActive ? 'Deactivate' : 'Activate' }}
+            </button>
+          </td>
+         
+          
+          <!-- <td>
+            <button (click)="openUserDetail(user)">View Details</button>
+          </td> -->
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- <div class="pagination">
+      <button (click)="page = page - 1" [disabled]="page === 1">Prev</button>
+      <button *ngFor="let p of [1,2,3]" (click)="page = p" [class.active]="page === p">{{ p }}</button>
+      <button (click)="page = page + 1" [disabled]="page * pageSize >= chefList.length">Next</button>
+    </div> -->
+  </div>
+  

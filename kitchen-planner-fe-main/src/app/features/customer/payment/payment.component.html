@@ -1,0 +1,61 @@
+<div class="payment-page">
+  <div class="payment-card">
+    <h2>Checkout</h2>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div class="order-row">
+        <span>Order ID:</span>
+        <span>{{ orderId }}</span>
+      </div>
+      <div class="order-row total">
+        <span>Total:</span>
+        <span>€{{ cartService.getTotalOrderCost() }}</span>
+      </div>
+    </div>
+      <div *ngIf="isPaid === null" class="payment-loading">
+      <p>Checking payment status...</p>
+    </div>
+    <!-- Already Paid Error -->
+    <div *ngIf="isPaid" class="payment-error">
+      <h3>⚠️ Payment Already Completed</h3>
+      <p>This order has already been paid. No further action is required.</p>
+    </div>
+
+    <!-- Payment Options -->
+    <form *ngIf="!isPaid">
+      <label class="section-label">Choose Payment Method:</label>
+      <div class="payment-options">
+        <label [class.selected]="paymentMethod === 'stripe'">
+          <input type="radio" name="payment" [(ngModel)]="paymentMethod" value="stripe"
+            (click)="createStripePaymentIntent()" />
+          <span>
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/stripe.svg" alt="Stripe" class="icon" />
+            Stripe
+          </span>
+        </label>
+        <label [class.selected]="paymentMethod === 'paypal'">
+          <input type="radio" name="payment" [(ngModel)]="paymentMethod" value="paypal"
+            (click)="onPayPalSelected()" />
+          <span>
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/paypal.svg" alt="PayPal" class="icon" />
+            PayPal
+          </span>
+        </label>
+      </div>
+
+      <!-- Payment Forms -->
+      <div *ngIf="paymentMethod === 'stripe'" class="payment-form">
+        <h3>Pay with Card</h3>
+        <div id="card-element" class="card-element"></div>
+        <button type="button" (click)="pay()">Pay Now</button>
+      </div>
+
+      <div *ngIf="paymentMethod === 'paypal'" class="payment-form">
+        <h3>Pay with PayPal</h3>
+        <div id="paypal-button-container" class="paypal-button"></div>
+      </div>
+    </form>
+  </div>
+</div>

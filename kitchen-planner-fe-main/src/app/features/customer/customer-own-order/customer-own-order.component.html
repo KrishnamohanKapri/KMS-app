@@ -1,0 +1,94 @@
+<app-navbar></app-navbar>
+<div class="orders-container">
+  <h2>My Orders</h2>
+
+  <div *ngIf="pagedOrders.length === 0" class="empty-msg">
+    🛒 No orders yet
+  </div>
+
+  <div *ngFor="let order of pagedOrders" class="order-card">
+    <div class="order-header">
+      <div>
+        <h3>Order #{{order._id}}</h3>
+        <p><strong>Status:</strong>
+          <span [ngClass]="{
+            'pending': order.status === 'pending',
+            'preparing': order.status === 'preparing',
+            'ready': order.status === 'ready',
+            'delivered': order.status === 'delivered',
+            'cancelled': order.status === 'cancelled',
+            'confirmed': order.status === 'confirmed'
+          }">{{ order.status | titlecase }}</span>
+        </p>
+        <p><strong>Date:</strong> {{order.createdAt | date:'medium'}}</p>
+      </div>
+      <div class="order-total">
+        <p><strong>Total:</strong> {{order.total | currency:'EUR':'symbol':'1.2-2'}}</p>
+      </div>
+    </div>
+
+    <div class="order-body">
+      <!-- Meals -->
+      <div class="meals">
+        <h4>🍽️ Meals</h4>
+        <ul>
+          <li *ngFor="let meal of order.meals">
+            {{meal.mealDetails?.title}} <span class="qty">x{{meal.qty}}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Billing -->
+      <div class="billing">
+        <h4>💳 Billing Info</h4>
+        <p>{{order.billingInfo.firstName}} {{order.billingInfo.lastName}}</p>
+        <p>{{order.billingInfo.email}}</p>
+        <p>{{order.billingInfo.phone}}</p>
+        <p>{{order.billingInfo.address.street}}, {{order.billingInfo.address.city}}, {{order.billingInfo.address.state}}
+        </p>
+      </div>
+
+      <!-- Delivery -->
+      <div class="delivery">
+        <h4>🚚 Delivery Address</h4>
+        <p>{{order.deliveryAddress.street}}, {{order.deliveryAddress.city}}, {{order.deliveryAddress.state}}</p>
+        <p><strong>Instructions:</strong> {{order.deliveryAddress.instructions}}</p>
+      </div>
+
+      <!-- Totals -->
+      <div class="totals">
+        <h4>📊 Order Summary</h4>
+        <p>Subtotal: {{order.subTotal | currency:'EUR':'symbol':'1.2-2'}}</p>
+        <p>Tax: {{order.tax | currency:'EUR':'symbol':'1.2-2'}}</p>
+        <p>Delivery Fee: {{order.deliveryFee | currency:'EUR':'symbol':'1.2-2'}}</p>
+        <p>Discount: -{{order.discount | currency:'EUR':'symbol':'1.2-2'}}</p>
+        <p class="final-total"><strong>Total: {{order.total | currency:'EUR':'symbol':'1.2-2'}}</strong></p>
+      </div>
+    </div>
+
+    <div class="order-footer">
+      <p><strong>Special Instructions:</strong> {{order.specialInstructions || 'None'}}</p>
+    </div>
+
+    <div *ngIf="order.status === 'pending'" class="cancel-btn">
+      <button mat-raised-button color="warn"
+        style="font-weight: 600; border-radius: 20px; box-shadow: 0 2px 8px #e0e0e0;" (click)="cancelOrder(order)">
+        <mat-icon>cancel</mat-icon>
+        Cancel Order
+      </button>
+    </div>
+
+    <div *ngIf="order.status === 'in-delivery'" class="cancel-btn">
+      <button mat-raised-button color="warn"
+        style="font-weight: 600; border-radius: 20px; box-shadow: 0 2px 8px #e0e0e0;" (click)="openTrackDialog(order)">
+        <mat-icon>map</mat-icon>
+        Track Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator [length]="orders.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+</div>

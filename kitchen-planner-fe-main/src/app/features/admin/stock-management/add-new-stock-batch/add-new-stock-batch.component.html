@@ -1,0 +1,58 @@
+<div class="add-batch-container">
+	<h2>Add New Stock Batch</h2>
+	<form [formGroup]="batchForm" (ngSubmit)="submit()">
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Package Quantity</mat-label>
+			<input matInput type="number" formControlName="packageQuantity" min="1" required />
+			<mat-error *ngIf="batchForm.get('packageQuantity')?.hasError('required')">Required</mat-error>
+			<mat-error *ngIf="batchForm.get('packageQuantity')?.hasError('min')">Must be greater than 0</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Base Unit Quantity</mat-label>
+			<input matInput type="number" formControlName="baseUnitQuantity" min="1" required />
+			<mat-hint *ngIf="ingredient">Expected: {{batchForm.value.packageQuantity * ingredient.packagingQuantity || 0}} {{ingredient.baseUnit}}</mat-hint>
+			<mat-error *ngIf="batchForm.get('baseUnitQuantity')?.hasError('required')">Required</mat-error>
+			<mat-error *ngIf="batchForm.get('baseUnitQuantity')?.hasError('min')">Must be greater than 0</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Expiry Date</mat-label>
+			<input matInput type="date" formControlName="expiryDate" required />
+			<mat-error *ngIf="batchForm.get('expiryDate')?.hasError('required')">Required</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Received Date</mat-label>
+			<input matInput type="date" formControlName="receivedDate" />
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Batch Number</mat-label>
+			<input matInput type="text" formControlName="batchNumber" />
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Cost Per Package</mat-label>
+			<input matInput type="number" formControlName="costPerPackage" min="0" required />
+			<mat-error *ngIf="batchForm.get('costPerPackage')?.hasError('required')">Required</mat-error>
+			<mat-error *ngIf="batchForm.get('costPerPackage')?.hasError('min')">Must be non-negative</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Supplier</mat-label>
+			<input matInput type="text" formControlName="supplier" />
+		</mat-form-field>
+
+		<mat-form-field appearance="outline" class="full-width">
+			<mat-label>Purchase Order</mat-label>
+			<input matInput type="text" formControlName="purchaseOrder" />
+		</mat-form-field>
+
+		<div class="form-actions">
+			<button mat-raised-button color="primary" type="submit" [disabled]="batchForm.invalid || loading">Add Batch</button>
+			<button mat-raised-button type="button" (click)="cancel()">Cancel</button>
+		</div>
+	</form>
+	<div *ngIf="loading" style="margin-top: 1em; text-align:center; color:#00796b; font-weight:500;">Saving...</div>
+</div>

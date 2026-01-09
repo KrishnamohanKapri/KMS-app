@@ -1,0 +1,59 @@
+<div class="batches-table">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+    <!-- Batch Number -->
+    <ng-container matColumnDef="batchNumber">
+      <th mat-header-cell *matHeaderCellDef> Batch # </th>
+      <td mat-cell *matCellDef="let row"> {{ row.batchNumber }} </td>
+    </ng-container>
+
+    <!-- Package Quantity -->
+    <ng-container matColumnDef="packageQuantity">
+      <th mat-header-cell *matHeaderCellDef> Packages </th>
+      <td mat-cell *matCellDef="let row"> {{ row.packageQuantity }} </td>
+    </ng-container>
+
+    <!-- Base Unit Quantity -->
+    <ng-container matColumnDef="baseUnitQuantity">
+      <th mat-header-cell *matHeaderCellDef> Base Units </th>
+      <td mat-cell *matCellDef="let row"> {{ row.baseUnitQuantity }} </td>
+    </ng-container>
+
+    <!-- Display Quantity -->
+    <ng-container matColumnDef="displayQuantity">
+      <th mat-header-cell *matHeaderCellDef> Display Qty </th>
+      <td mat-cell *matCellDef="let row"> {{ row.displayQuantity }} </td>
+    </ng-container>
+
+    <!-- Cost Per Package -->
+    <ng-container matColumnDef="costPerPackage">
+      <th mat-header-cell *matHeaderCellDef> Cost/Package </th>
+      <td mat-cell *matCellDef="let row"> {{ row.costPerPackage | currency:'EUR' }} </td>
+    </ng-container>
+
+    <!-- Total Cost -->
+    <ng-container matColumnDef="totalCost">
+      <th mat-header-cell *matHeaderCellDef> Total Cost </th>
+      <td mat-cell *matCellDef="let row"> {{ row.totalCost | currency:'EUR' }} </td>
+    </ng-container>
+
+    <!-- Received Date -->
+    <ng-container matColumnDef="receivedDate">
+      <th mat-header-cell *matHeaderCellDef> Received </th>
+      <td mat-cell *matCellDef="let row"> {{ row.receivedDate | date:'short' }} </td>
+    </ng-container>
+
+    <!-- Expiry Date -->
+    <ng-container matColumnDef="expiryDate">
+      <th mat-header-cell *matHeaderCellDef> Expiry </th>
+      <td mat-cell *matCellDef="let row"> {{ row.expiryDate | date:'short' }} </td>
+    </ng-container>
+
+    <!-- Header + Row Rendering -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- Pagination -->
+  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5, 10, 20]"></mat-paginator>
+</div>

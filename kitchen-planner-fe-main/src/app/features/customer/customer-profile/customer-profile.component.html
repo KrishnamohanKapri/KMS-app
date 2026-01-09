@@ -1,0 +1,136 @@
+<app-navbar></app-navbar>
+
+<div class="profile-summary-card">
+  <h3>Account Summary</h3>
+  <div class="info-row">
+    <span class="info-label">Loyalty Points:</span>
+    <span class="info-value">{{ loyaltyPoints }}</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">Total Orders:</span>
+    <span class="info-value">{{ totalOrders }}</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">Total Spent:</span>
+    <span class="info-value">{{ totalSpent | currency:'EUR':'symbol':'1.2-2' }}</span>
+  </div>
+</div>
+
+<div class="profile-container">
+  <form [formGroup]="userForm" autocomplete="off">
+    <h2>Customer Profile</h2>
+
+    <!-- User Info -->
+    <div [formGroup]="userForm" class="profile-form form-section">
+      <h3>User Info</h3>
+      <mat-form-field appearance="outline" class="full-width" data-cy="profile-firstname-field"
+        [class.invalid]="userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" data-cy="profile-firstname-input" />
+        <mat-error *ngIf="userForm.get('firstName')?.invalid">First Name is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width" data-cy="profile-lastname-field"
+        [class.invalid]="userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" data-cy="profile-lastname-input" />
+        <mat-error *ngIf="userForm.get('lastName')?.invalid">Last Name is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Billing Info -->
+    <div [formGroup]="billingForm" class="profile-form form-section">
+      <h3>Billing Information</h3>
+
+      <mat-form-field appearance="outline" class="full-width" data-cy="profile-phone-field"
+        [class.invalid]="billingForm.get('phone')?.invalid && billingForm.get('phone')?.touched">
+        <mat-label>Phone</mat-label>
+        <input matInput formControlName="phone" data-cy="profile-phone-input" />
+        <mat-error *ngIf="billingForm.get('phone')?.invalid">Phone is required</mat-error>
+      </mat-form-field>
+
+      <h4>Address</h4>
+      <div [formGroup]="billingAddress">
+        <mat-form-field appearance="outline" class="full-width" data-cy="profile-street-field"
+          [class.invalid]="billingAddress.get('street')?.invalid && billingAddress.get('street')?.touched">
+          <mat-label>Street</mat-label>
+          <input matInput formControlName="street" data-cy="profile-street-input" />
+          <mat-error *ngIf="billingAddress.get('street')?.invalid">Street is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" data-cy="profile-city-field"
+          [class.invalid]="billingAddress.get('city')?.invalid && billingAddress.get('city')?.touched">
+          <mat-label>City</mat-label>
+          <input matInput formControlName="city" data-cy="profile-city-input" />
+          <mat-error *ngIf="billingAddress.get('city')?.invalid">City is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" data-cy="profile-state-field"
+          [class.invalid]="billingAddress.get('state')?.invalid && billingAddress.get('state')?.touched">
+          <mat-label>State</mat-label>
+          <input matInput formControlName="state" data-cy="profile-state-input" />
+          <mat-error *ngIf="billingAddress.get('state')?.invalid">State is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" data-cy="profile-zipcode-field"
+          [class.invalid]="billingAddress.get('zipCode')?.invalid && billingAddress.get('zipCode')?.touched">
+          <mat-label>Zip Code</mat-label>
+          <input matInput formControlName="zipCode" data-cy="profile-zipcode-input" />
+          <mat-error *ngIf="billingAddress.get('zipCode')?.invalid">Zip Code is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" data-cy="profile-country-field"
+          [ngClass]="{'error-field': billingAddress.get('country')?.invalid && billingAddress.get('country')?.touched}">
+          <mat-label>Country </mat-label>
+          <mat-select formControlName="country" required data-cy="profile-country-dropdown">
+            <mat-option *ngFor="let country of countries" [value]="country" [attr.data-cy]="'profile-country-option-' + country">{{ country }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="billingAddress.get('country')?.hasError('required')">Country is required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Preferences -->
+    <div [formGroup]="preferencesForm" class="profile-form form-section">
+      <h3>Preferences</h3>
+
+      <div class="dietary-section">
+        <label>Dietary Restrictions</label>
+        <div class="dietary-options">
+          <mat-checkbox *ngFor="let option of dietaryOptions; let i = index"
+            [formControl]="dietaryRestrictionControls[i]">{{ option }}</mat-checkbox>
+        </div>
+      </div>
+
+          <mat-form-field appearance="outline" class="full-width" data-cy="profile-allergies-field"
+          [ngClass]="{'error-field': billingAddress.get('allergies')?.invalid && billingAddress.get('allergies')?.touched}">
+          <mat-label>Allergens </mat-label>
+          <mat-select formControlName="allergies" required multiple data-cy="profile-allergies-dropdown">
+            <mat-option *ngFor="let allergen of allergens" [value]="allergen.name" [attr.data-cy]="'profile-allergen-option-' + allergen.name">{{ allergen.name }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="billingAddress.get('allergies')?.hasError('allergies')">Allergens is required</mat-error>
+        </mat-form-field>
+    
+
+      <mat-form-field appearance="outline" class="full-width" data-cy="profile-payment-field"
+        [class.invalid]="preferencesForm.get('preferredPaymentMethod')?.invalid && preferencesForm.get('preferredPaymentMethod')?.touched">
+        <mat-label>Preferred Payment Method</mat-label>
+        <mat-select formControlName="preferredPaymentMethod" data-cy="profile-payment-dropdown">
+          <mat-option *ngFor="let option of paymentOptions" [value]="option" [attr.data-cy]="'profile-payment-option-' + option">{{ option | titlecase }}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="preferencesForm.get('preferredPaymentMethod')?.invalid">Preferred Payment Method is
+          required</mat-error>
+      </mat-form-field>
+
+      <mat-checkbox formControlName="newsletterSubscription">Subscribe to Newsletter</mat-checkbox>
+      <mat-checkbox formControlName="marketingEmails">Receive Marketing Emails</mat-checkbox>
+    </div>
+
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="button"
+        [disabled]="loading || billingForm.invalid || preferencesForm.invalid || userForm.invalid"
+        (click)="onSaveProfile()" data-cy="profile-save-btn">Save Profile</button>
+      <button mat-stroked-button color="warn" type="button" (click)="cancel()" data-cy="profile-cancel-btn">Cancel</button>
+    </div>
+  </form>
+</div>

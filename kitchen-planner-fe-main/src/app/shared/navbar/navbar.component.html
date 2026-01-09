@@ -1,0 +1,116 @@
+<mat-toolbar class="navbar">
+  <!-- Centered Logo -->
+  <div class="navbar-logo" routerLink="/">
+    <img src="assets/images/logo.PNG" class="logo" />
+    <span class="app-name">Kitchen Planner</span>
+  </div>
+
+  <span class="spacer"></span>
+
+  <!-- Right Section -->
+  <div class="navbar-right">
+    <!-- If user is logged in -->
+    <ng-container *ngIf="user; else loginBtns">
+      <!-- Meals link for user -->
+      <button mat-button *ngIf="user?.role === 'user'" routerLink="/customer/meals-dashboard">
+        Meals
+      </button>
+
+      <!-- Cart Icon -->
+      <button mat-icon-button *ngIf="user?.role === 'user'" routerLink="/checkout/cart" style="position: relative;">
+        <mat-icon>shopping_cart</mat-icon>
+        <span *ngIf="totalItems > 0" class="cart-badge">{{ totalItems }}</span>
+      </button>
+
+      <!-- Notifications -->
+      @if(user){
+      <button mat-icon-button [matMenuTriggerFor]="notificationMenu" aria-label="Notifications">
+        <mat-icon>notifications</mat-icon>
+        <span *ngIf="hasUnread" class="badge">{{ unreadCount }}</span>
+      </button>
+
+      <mat-menu #notificationMenu="matMenu" class="notification-menu">
+        <h4 class="menu-title">Notifications</h4>
+        <ng-container *ngIf="notifications.length; else noNotifications">
+          <button mat-menu-item *ngFor="let notification of topNotifications"
+                  (click)="openNotification(notification)" [class.unread]="!notification.isRead">
+            <div class="notification-item">
+              <strong>{{ notification.title }}</strong>
+              <p>{{ notification.message }}</p>
+              <small>{{ getRelativeTime(notification.createdAt) }}</small>
+            </div>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="navigateToAllNotifications()">
+            <mat-icon>arrow_forward</mat-icon> See All
+          </button>
+        </ng-container>
+        <ng-template #noNotifications>
+          <p class="no-notifications">No notifications</p>
+        </ng-template>
+      </mat-menu>
+
+      <!-- User Dropdown -->
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
+        <mat-icon>account_circle</mat-icon>
+        <span>Hi, {{ firstName }}</span>
+      </button>
+      <mat-menu #userMenu="matMenu" class="user-menu-panel">
+        <div class="user-header">
+          <div class="avatar">{{ firstName[0] }}</div>
+          <div class="user-info">
+            <strong>{{ firstName }} </strong>
+            <small>{{ role | titlecase }}</small>
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+        @if(role === 'user'){
+        <button mat-menu-item routerLink="/customer/customer-profile">
+          <mat-icon>person</mat-icon> My Profile
+        </button>
+        }
+        @if(role === 'admin'){
+          <button mat-menu-item routerLink="/admin/dashboard">
+            <mat-icon>dashboard</mat-icon> Dashboard
+          </button>
+        }
+        @else if(role === 'employee'){
+          <button mat-menu-item routerLink="/employee/orders">
+            <mat-icon>dashboard</mat-icon> Orders
+          </button>
+        }
+        @else if(role === 'chef'){
+          <button mat-menu-item routerLink="/chef/orders">
+            <mat-icon>dashboard</mat-icon> Orders
+          </button>
+        }
+        @else if(role === 'rider'){
+          <button mat-menu-item routerLink="/rider/orders">
+            <mat-icon>dashboard</mat-icon> Orders
+          </button>
+        }
+        @else if(role === 'user'){
+        <button mat-menu-item routerLink="/customer/customer-own-order">
+          <mat-icon>fastfood</mat-icon> My Orders
+        </button>
+        }
+        <button mat-menu-item routerLink="/change-password">
+          <mat-icon>lock</mat-icon> Change Password
+        </button>
+
+        <mat-divider></mat-divider>
+
+        <button mat-menu-item class="logout" (click)="logout()">
+          <mat-icon>logout</mat-icon> Logout
+        </button>
+      </mat-menu>
+      }
+    </ng-container>
+
+    <!-- If not logged in -->
+    <ng-template #loginBtns>
+      <button mat-stroked-button color="primary" routerLink="/login">Login</button>
+      <button mat-stroked-button color="primary" routerLink="/signup">Sign Up</button>
+    </ng-template>
+  </div>
+</mat-toolbar>

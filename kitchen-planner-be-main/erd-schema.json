@@ -1,0 +1,373 @@
+{
+  "title": "Kitchen Management System (KMS) - Complete Database Schema",
+  "description": "Normalized database schema for a comprehensive kitchen management system",
+  "version": "2.0.0",
+  "entities": {
+    "User": {
+      "description": "Core user entity with authentication and role-based access",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "firstName": { "type": "String", "required": true },
+        "lastName": { "type": "String", "required": true },
+        "email": { "type": "String", "required": true, "unique": true },
+        "password": { "type": "String", "required": true },
+        "role": { "type": "String", "enum": ["user", "admin", "chef"], "default": "user" },
+        "profileImage": { "type": "String" },
+        "isActive": { "type": "Boolean", "default": true },
+        "status": { "type": "String", "enum": ["active", "inactive"], "default": "active" },
+        "kitchenNo": { "type": "String", "default": "001" },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Attendance": {
+      "description": "Tracks staff attendance for meal planning and resource management",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "user": { "type": "ObjectId", "ref": "User", "required": true },
+        "date": { "type": "Date", "required": true },
+        "isPresent": { "type": "Boolean", "default": true },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Newsletter": {
+      "description": "Email subscription management for marketing",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "email": { "type": "String", "required": true, "unique": true },
+        "isSubscribed": { "type": "Boolean", "default": true },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Category": {
+      "description": "Meal categorization (e.g., Breakfast, Lunch, Dinner)",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "name": { "type": "String", "required": true },
+        "description": { "type": "String" },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Meal": {
+      "description": "Core meal entity with basic information and references to normalized data",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "title": { "type": "String", "required": true },
+        "description": { "type": "String", "required": true },
+        "servings": { "type": "Number", "required": true },
+        "price": { "type": "Number", "required": true },
+        "category": { "type": "ObjectId", "ref": "Category" },
+        "images": { "type": "[String]", "required": true },
+        "isActive": { "type": "Boolean", "default": true },
+        "nutritionalInfo": { "type": "ObjectId", "ref": "NutritionalInfo" },
+        "dietaryInfo": { "type": "ObjectId", "ref": "DietaryInfo" },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "NutritionalInfo": {
+      "description": "Detailed nutritional breakdown (calories, protein, etc.)",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "calories": { "type": "Number" },
+        "protein": { "type": "Number" },
+        "carbohydrates": { "type": "Number" },
+        "fat": { "type": "Number" },
+        "fiber": { "type": "Number" },
+        "sugar": { "type": "Number" },
+        "sodium": { "type": "Number" },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "DietaryInfo": {
+      "description": "Dietary restrictions and preferences (vegetarian, gluten-free, etc.)",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "isVegetarian": { "type": "Boolean", "default": false },
+        "isVegan": { "type": "Boolean", "default": false },
+        "isGlutenFree": { "type": "Boolean", "default": false },
+        "isDairyFree": { "type": "Boolean", "default": false },
+        "isNutFree": { "type": "Boolean", "default": false },
+        "isHalal": { "type": "Boolean", "default": false },
+        "isKosher": { "type": "Boolean", "default": false },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Allergen": {
+      "description": "Allergen definitions (nuts, dairy, etc.)",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "name": { "type": "String", "required": true },
+        "description": { "type": "String" },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "MealAllergen": {
+      "description": "Many-to-many relationship between meals and allergens",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "mealId": { "type": "ObjectId", "ref": "Meal", "required": true },
+        "allergenId": { "type": "ObjectId", "ref": "Allergen", "required": true },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Ingredient": {
+      "description": "Ingredient definitions with stock management",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "name": { "type": "String", "required": true, "unique": true },
+        "description": { "type": "String", "required": true },
+        "category": { "type": "String", "enum": ["vegetable", "fruit", "meat", "dairy", "grain", "spice", "herb", "other"], "required": true },
+        "stock": { "type": "Number", "required": true, "default": 0, "min": 0 },
+        "unit": { "type": "String", "enum": ["g", "kg", "ml", "l", "tbsp", "tsp", "cup", "piece", "slice", "whole"], "default": "g" },
+        "reorderLevel": { "type": "Number", "required": true, "default": 10, "min": 0 },
+        "costPerUnit": { "type": "Number", "required": true, "default": 0, "min": 0 },
+        "isActive": { "type": "Boolean", "default": true },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "IngredientBatch": {
+      "description": "Batch tracking with expiry dates for inventory management",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "ingredientId": { "type": "ObjectId", "ref": "Ingredient", "required": true },
+        "quantity": { "type": "Number", "required": true, "min": 0 },
+        "expiryDate": { "type": "Date", "required": true },
+        "receivedDate": { "type": "Date", "default": "Date.now" },
+        "batchNumber": { "type": "String" },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "MealIngredient": {
+      "description": "Many-to-many relationship between meals and ingredients with quantities",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "mealId": { "type": "ObjectId", "ref": "Meal", "required": true },
+        "ingredientId": { "type": "ObjectId", "ref": "Ingredient", "required": true },
+        "quantity": { "type": "Number", "required": true },
+        "unit": { "type": "String", "required": true },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Tag": {
+      "description": "Flexible tagging system for meals (e.g., 'Spicy', 'Chef's Special')",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "name": { "type": "String", "required": true },
+        "description": { "type": "String" },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "MealTag": {
+      "description": "Many-to-many relationship between meals and tags",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "mealId": { "type": "ObjectId", "ref": "Meal", "required": true },
+        "tagId": { "type": "ObjectId", "ref": "Tag", "required": true },
+        "createdAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "MealPlan": {
+      "description": "Daily/weekly meal planning with staff assignments",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "date": { "type": "Date", "required": true },
+        "meals": {
+          "type": "Array",
+          "items": {
+            "mealId": { "type": "ObjectId", "ref": "Meal", "required": true },
+            "servings": { "type": "Number", "required": true }
+          }
+        },
+        "type": { "type": "String", "enum": ["day", "week"], "default": "day" },
+        "createdBy": { "type": "ObjectId", "ref": "User" },
+        "assignedStaff": { "type": "[ObjectId]", "ref": "User" },
+        "notes": { "type": "String" },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Order": {
+      "description": "Customer order management with payment tracking",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "userId": { "type": "ObjectId", "ref": "User", "required": true },
+        "items": {
+          "type": "Array",
+          "items": {
+            "mealId": { "type": "ObjectId", "ref": "Meal", "required": true },
+            "quantity": { "type": "Number", "required": true },
+            "price": { "type": "Number", "required": true }
+          }
+        },
+        "totalAmount": { "type": "Number", "required": true },
+        "status": { "type": "String", "enum": ["pending", "confirmed", "preparing", "ready", "in-delivery", "delivered", "cancelled"] },
+        "paymentStatus": { "type": "String", "enum": ["pending", "paid", "failed"] },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    },
+    "Notification": {
+      "description": "User notification system for alerts and updates",
+      "fields": {
+        "_id": { "type": "ObjectId", "primary": true },
+        "userId": { "type": "ObjectId", "ref": "User", "required": true },
+        "title": { "type": "String", "required": true },
+        "message": { "type": "String", "required": true },
+        "type": { "type": "String", "enum": ["info", "warning", "error", "success"] },
+        "isRead": { "type": "Boolean", "default": false },
+        "createdAt": { "type": "Date", "default": "Date.now" },
+        "updatedAt": { "type": "Date", "default": "Date.now" }
+      }
+    }
+  },
+  "relationships": [
+    {
+      "from": "User",
+      "to": "Attendance",
+      "type": "one-to-many",
+      "description": "User has multiple attendance records"
+    },
+    {
+      "from": "User",
+      "to": "Order",
+      "type": "one-to-many",
+      "description": "User places multiple orders"
+    },
+    {
+      "from": "User",
+      "to": "Notification",
+      "type": "one-to-many",
+      "description": "User receives multiple notifications"
+    },
+    {
+      "from": "User",
+      "to": "MealPlan",
+      "type": "one-to-many",
+      "description": "User creates multiple meal plans"
+    },
+    {
+      "from": "Category",
+      "to": "Meal",
+      "type": "one-to-many",
+      "description": "Category contains multiple meals"
+    },
+    {
+      "from": "Meal",
+      "to": "NutritionalInfo",
+      "type": "one-to-one",
+      "description": "Meal has one nutritional info record"
+    },
+    {
+      "from": "Meal",
+      "to": "DietaryInfo",
+      "type": "one-to-one",
+      "description": "Meal has one dietary info record"
+    },
+    {
+      "from": "Meal",
+      "to": "MealAllergen",
+      "type": "one-to-many",
+      "description": "Meal has multiple allergen relationships"
+    },
+    {
+      "from": "Allergen",
+      "to": "MealAllergen",
+      "type": "one-to-many",
+      "description": "Allergen belongs to multiple meal relationships"
+    },
+    {
+      "from": "Meal",
+      "to": "MealIngredient",
+      "type": "one-to-many",
+      "description": "Meal contains multiple ingredients"
+    },
+    {
+      "from": "Ingredient",
+      "to": "MealIngredient",
+      "type": "one-to-many",
+      "description": "Ingredient used in multiple meals"
+    },
+    {
+      "from": "Meal",
+      "to": "MealTag",
+      "type": "one-to-many",
+      "description": "Meal has multiple tags"
+    },
+    {
+      "from": "Tag",
+      "to": "MealTag",
+      "type": "one-to-many",
+      "description": "Tag applied to multiple meals"
+    },
+    {
+      "from": "Meal",
+      "to": "MealPlan",
+      "type": "one-to-many",
+      "description": "Meal planned in multiple meal plans"
+    },
+    {
+      "from": "Meal",
+      "to": "Order",
+      "type": "one-to-many",
+      "description": "Meal ordered in multiple orders"
+    },
+    {
+      "from": "Ingredient",
+      "to": "IngredientBatch",
+      "type": "one-to-many",
+      "description": "Ingredient has multiple batches"
+    }
+  ],
+  "features": {
+    "normalization": {
+      "description": "All complex data is normalized into separate collections",
+      "benefits": [
+        "Better performance with faster queries",
+        "Reduced data duplication",
+        "Improved data integrity",
+        "Easier maintenance and updates"
+      ]
+    },
+    "stockManagement": {
+      "description": "Advanced batch-based inventory management",
+      "features": [
+        "Batch tracking with expiry dates",
+        "Automatic stock calculation from non-expired batches",
+        "Low stock alerts and reorder level management",
+        "Cost tracking per ingredient"
+      ]
+    },
+    "mealPlanning": {
+      "description": "Comprehensive meal planning system",
+      "features": [
+        "Daily and weekly meal planning",
+        "Staff assignment and resource checking",
+        "Stock sufficiency validation",
+        "Integration with attendance tracking"
+      ]
+    },
+    "userManagement": {
+      "description": "Role-based access control and staff management",
+      "features": [
+        "Multiple user roles (admin, chef, user)",
+        "Attendance tracking for resource planning",
+        "Staff assignment to meal plans",
+        "Secure authentication with JWT"
+      ]
+    },
+    "tagging": {
+      "description": "Flexible meal categorization system",
+      "features": [
+        "Dynamic tagging without hardcoding",
+        "Easy filtering and search capabilities",
+        "Scalable tagging system",
+        "Many-to-many relationships"
+      ]
+    }
+  }
+}

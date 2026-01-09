@@ -1,0 +1,103 @@
+.page-wrapper {
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem 1rem;
+}
+
+.order-details-card {
+  width: 95%;
+  margin: auto;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.section {
+  margin: 2rem 0;
+}
+
+.card-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #00796b;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customer-info p, .payment-summary p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.status-update-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.update-status-btn {
+  font-weight: 600;
+  border-radius: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.meals-table, .payment-table {
+  width: 100%;
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mat-header-cell {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.mat-cell {
+  background-color: #fff;
+  padding: 0.75rem;
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.timeline-item .icon {
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-item.pending { background-color: #fff3e0; color: #e65100; }
+.timeline-item.confirmed { background-color: #e3f2fd; color: #0d47a1; }
+.timeline-item.preparing { background-color: #f3e5f5; color: #6a1b9a; }
+.timeline-item.ready { background-color: #e0f2f1; color: #004d40; }
+.timeline-item.delivered { background-color: #e8f5e9; color: #1b5e20; }
+.timeline-item.processing { background-color: #e1f5fe; color: #01579b; }
+.timeline-item.out_for_delivery { background-color: #efebe9; color: #3e2723; }
+.timeline-item.cancelled { background-color: #ffebee; color: #b71c1c; }
+.timeline-item.approved { background-color: #e8f5e9; color: #1b5e20; }

@@ -1,0 +1,100 @@
+<app-navbar></app-navbar>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav mode="side" opened class="sidenav">
+    <h3 class="brand">
+      @if(role == 'admin'){
+        Admin Panel
+      } @else if (role == 'rider') {
+        Rider Panel
+      } @else if (role == 'chef') {
+        Chef Panel
+      } @else if(role == 'employee'){
+        Employee Panel
+      }
+    </h3>
+
+    <nav>
+      <!-- Admin Links -->
+      @if(role === 'admin'){
+        <a routerLink="dashboard" routerLinkActive="active" class="menu-item">Dashboard</a>
+        <a routerLink="recent-activity" routerLinkActive="active" class="menu-item">Recent Activity</a>
+        <a routerLink="orders" routerLinkActive="active" class="menu-item">Orders</a>
+        <a routerLink="/admin/weekly-planner" routerLinkActive="active" class="menu-item">Meal Planner</a>
+        <a routerLink="/admin/meal-manager" routerLinkActive="active" class="menu-item">Meal Management</a>
+        <a routerLink="/admin/kitchen-rules" routerLinkActive="active" class="menu-item">Kitchen Rules</a>
+        <a routerLink="/admin/recipe-workflows" routerLinkActive="active" class="menu-item">Recipe Workflows</a>
+        <a routerLink="/admin/category-management" routerLinkActive="active" class="menu-item">Category Management</a>
+        <a routerLink="/admin/customers" routerLinkActive="active" class="menu-item">Customer</a>
+        <a routerLink="/admin/cheflist" routerLinkActive="active" class="menu-item">Chef Management</a>
+
+        <!-- Stock Management Accordion -->
+        <mat-accordion class="stock-accordion" multi>
+          <mat-expansion-panel [expanded]="isStockSubmenuActive()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Stock Management</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <a routerLink="/admin/stock-management" routerLinkActive="active" class="sub-item">Overview</a>
+            <a routerLink="/admin/out-of-stock" routerLinkActive="active" class="sub-item">Out Of Stock</a>
+            <a routerLink="/admin/expiring-stock" routerLinkActive="active" class="sub-item">Expiring Stock</a>
+            <a routerLink="/admin/stock-report" routerLinkActive="active" class="sub-item">Stock Report</a>
+            <a routerLink="/admin/low-stock" routerLinkActive="active" class="sub-item">Low Stock</a>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <a routerLink="/admin/allergens-management" routerLinkActive="active" class="menu-item">Allergens Management</a>
+        <a routerLink="/admin/ingredients-management" routerLinkActive="active" class="menu-item">Ingredients Management</a>
+        <a routerLink="/admin/tags-management" routerLinkActive="active" class="menu-item">Tags Management</a>
+        <a routerLink="/admin/staff-management" routerLinkActive="active" class="menu-item">Staff Management</a>
+      }
+
+      <!-- Rider Links -->
+      @if(role === 'rider'){
+        <a routerLink="/rider/orders" routerLinkActive="active" class="menu-item">Orders</a>
+      }
+
+      <!-- Chef Links -->
+      @if(role === 'chef'){
+        <a routerLink="/chef/orders" routerLinkActive="active" class="menu-item">Orders</a>
+        <a routerLink="/chef/kitchen-rules" routerLinkActive="active" class="menu-item">Kitchen Rules</a>
+        <a routerLink="/chef/recipe-workflows" routerLinkActive="active" class="menu-item">Recipe Workflows</a>
+      }
+
+      <!-- Employee Links -->
+      @if(role === 'employee'){
+        <a routerLink="/employee/orders" routerLinkActive="active" class="menu-item">Orders</a>
+        <a routerLink="/employee/weekly-planner" routerLinkActive="active" class="menu-item">Meal Planner</a>
+        <a routerLink="/employee/meal-manager" routerLinkActive="active" class="menu-item">Meal Management</a>
+        <a routerLink="/employee/kitchen-rules" routerLinkActive="active" class="menu-item">Kitchen Rules</a>
+        <a routerLink="/employee/recipe-workflows" routerLinkActive="active" class="menu-item">Recipe Workflows</a>
+        <a routerLink="/employee/category-management" routerLinkActive="active" class="menu-item">Category Management</a>
+
+        <!-- Stock Management Accordion -->
+        <mat-accordion class="stock-accordion" multi>
+          <mat-expansion-panel [expanded]="isStockSubmenuActive()">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Stock Management</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <a routerLink="/employee/stock-management" routerLinkActive="active" class="sub-item">Overview</a>
+            <a routerLink="/employee/out-of-stock" routerLinkActive="active" class="sub-item">Out Of Stock</a>
+            <a routerLink="/employee/expiring-stock" routerLinkActive="active" class="sub-item">Expiring Stock</a>
+            <a routerLink="/employee/stock-report" routerLinkActive="active" class="sub-item">Stock Report</a>
+            <a routerLink="/employee/low-stock" routerLinkActive="active" class="sub-item">Low Stock</a>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <a routerLink="/employee/allergens-management" routerLinkActive="active" class="menu-item">Allergens Management</a>
+        <a routerLink="/employee/ingredients-management" routerLinkActive="active" class="menu-item">Ingredients Management</a>
+        <a routerLink="/employee/tags-management" routerLinkActive="active" class="menu-item">Tags Management</a>
+      }
+
+      <!-- Logout -->
+      <a (click)="logout()" class="menu-item logout">Logout</a>
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

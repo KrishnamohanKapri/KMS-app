@@ -1,0 +1,55 @@
+<div class="page-container">
+  <h2> Expiring Stock</h2>
+
+  <div *ngIf="items.length === 0" class="empty-msg">
+    ✅ No items expiring soon
+  </div>
+
+  <div class="table-wrapper" *ngIf="items.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Ingredient</th>
+          <th>Category</th>
+          <th>Expiry</th>
+          <th>Quantity</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of pagedItems">
+          <!-- Summary row -->
+          <tr (click)="item.expanded = !item.expanded">
+            <td>{{item.ingredientId.name}}</td>
+            <td>{{item.ingredientId.category | titlecase}}</td>
+            <td><span class="expire">{{item.expiryDate | date:'mediumDate'}}</span></td>
+            <td>{{item.displayQuantity}}</td>
+            <td>
+              <button mat-button color="primary" (click)="$event.stopPropagation(); item.expanded = !item.expanded">
+                {{item.expanded ? 'Hide' : 'Details'}}
+              </button>
+            </td>
+          </tr>
+
+          <!-- Expandable row -->
+          <tr *ngIf="item.expanded" class="expand-row">
+            <td colspan="5">
+              <div class="details">
+                <p><strong>Batch:</strong> {{item.batchNumber}}</p>
+                <p><strong>Received:</strong> {{item.receivedDate | date:'mediumDate'}}</p>
+                <p><strong>Stock:</strong> {{item.ingredientId.stock}} {{item.ingredientId.displayUnit}}</p>
+                <p><strong>Total Cost:</strong> {{item.totalCost | currency:'EUR':'symbol':'1.2-2'}}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+      <mat-paginator
+  [length]="items.length"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="[5, 10, 20]"
+  (page)="onPageChange($event)">
+</mat-paginator>
+  </div>
+</div>

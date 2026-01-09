@@ -1,0 +1,65 @@
+# Dependencies
+node_modules
+npm-debug.log
+
+# Git
+.git
+.gitignore
+.gitlab-ci.yml
+
+# Environment files
+.env
+.env.local
+.env.*.local
+src/config/config.env
+
+# Documentation
+*.md
+README.md
+API_ENDPOINTS_*.md
+STAFF_MANAGEMENT_GUIDE.md
+NORMALIZED_SCHEMA_DOCUMENTATION.md
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Build artifacts
+dist/
+build/
+coverage/
+.nyc_output
+
+# Database files
+*.db
+*.sqlite
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Diagrams
+*.puml
+erd-*.json
+erd-*.puml
+complete-schema.*
+
+# Scripts
+src/scripts/

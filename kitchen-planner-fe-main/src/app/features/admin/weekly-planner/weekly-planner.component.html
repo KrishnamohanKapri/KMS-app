@@ -1,0 +1,73 @@
+<div class="order-list-container">
+  <h2>Meal Planner Management</h2>
+
+  <div class="top-bar">
+    <input
+      class="search-input"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilter()"
+      placeholder="Search by meal, staff, or date" />
+    <button (click)="addPlan()">+ Add Plan</button>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef>Type</th>
+      <td mat-cell *matCellDef="let plan">{{ plan.type | titlecase }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="startDate">
+      <th mat-header-cell *matHeaderCellDef>Date</th>
+      <td mat-cell *matCellDef="let plan">{{ (plan.type === 'week' ? plan.startDate : plan.date) | date:'MMMM d, y' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="endDate">
+      <th mat-header-cell *matHeaderCellDef>End Date</th>
+      <td mat-cell *matCellDef="let plan">{{ plan.endDate | date:'EEEE, MMMM d, y' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="meals">
+      <th mat-header-cell *matHeaderCellDef>Meals</th>
+      <td mat-cell *matCellDef="let plan">
+    <ng-container *ngIf="plan.meals?.length">
+      <span *ngFor="let meal of plan.meals.slice(0, 3); let last = last">
+        {{ meal?.mealId?.title }}<span *ngIf="!last">, </span>
+      </span>
+      <span *ngIf="plan.meals.length > 3"> ...</span>
+    </ng-container>
+  </td>
+      <td mat-cell *matCellDef="let plan">{{ plan.meals }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="staff">
+      <th mat-header-cell *matHeaderCellDef>Staff</th>
+      
+      <td mat-cell *matCellDef="let plan">
+    <ng-container *ngIf="plan.assignedStaff?.length">
+      <span *ngFor="let staff of plan.assignedStaff.slice(0, 3); let last = last">
+        {{ staff?.firstName + ' ' +  staff?.lastName }}<span *ngIf="!last">, </span>
+      </span>
+      <span *ngIf="plan.meals.length > 3"> ...</span>
+    </ng-container>
+  </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let plan">
+        <div class="action-buttons">
+          <button (click)="viewPlan(plan._id)">View</button>
+          <button (click)="editPlan(plan._id)">Edit</button>
+          <button (click)="deletePlan(plan._id)">Delete</button>
+          <button (click)="duplicatePlan(plan)">Duplicate</button>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10]" showFirstLastButtons></mat-paginator>
+</div>

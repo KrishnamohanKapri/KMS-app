@@ -1,0 +1,21 @@
+<h2 mat-dialog-title style="display: flex; align-items: center; gap: 8px;">
+      <mat-icon color="accent">edit</mat-icon>
+      Update Order Status
+    </h2>
+    <div mat-dialog-content>
+      <mat-form-field appearance="fill" style="width: 100%;">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus">
+          <mat-option *ngFor="let status of statusOptions" [value]="status">
+            {{ status | titlecase }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" [disabled]="!selectedStatus" (click)="onSave()">
+        <mat-icon>check</mat-icon>
+        Update
+      </button>
+    </div>

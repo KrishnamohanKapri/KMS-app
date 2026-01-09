@@ -1,0 +1,71 @@
+<!-- <app-navbar></app-navbar> -->
+
+<div class="cart-page">
+  <h2>Your Cart</h2>
+
+  <!-- Clear Cart Button -->
+  <div class="cart-actions" *ngIf="cartItems.length > 0">
+    <button class="clear-btn" (click)="clearCart()">Clear Cart</button>
+  </div>
+
+  <!-- Empty Cart Message -->
+  <div *ngIf="cartItems.length === 0" class="empty-cart">
+    Your cart is currently empty.
+  </div>
+
+  <!-- Cart Items -->
+  <div *ngFor="let item of cartItems" class="cart-card">
+    <div class="cart-item-image">
+      <img *ngIf="item.image" [src]="item.image" alt="{{ item.name }}" />
+      <div *ngIf="!item.image" class="placeholder-img">No Image</div>
+    </div>
+    <div class="cart-info">
+  <h4>{{ item.name }}</h4>
+  <div class="quantity-controls">
+    <button (click)="decreaseQty(item)" [disabled]="item.qty <= 1">-</button>
+    <span>{{ item.qty }}</span>
+    <button (click)="increaseQty(item)" [disabled]="item.qty >= item.maxQty">+</button>
+  </div>
+  <p><strong>{{ item.price | currency:'EUR':'symbol':'1.2-2' }}</strong></p>
+</div>
+<button class="remove-btn" (click)="removeItem(item)">Remove</button>
+  </div>
+
+  <!-- Add More Items Section -->
+  <div class="add-section">
+    <h3>Add More Items</h3>
+    <div class="meal-scroll">
+      <div *ngFor="let meal of meals" class="meal-card-horizontal">
+        <img *ngIf="meal.image" [src]="meal.image" alt="{{ meal.title }}" />
+        <div class="meal-info-horizontal">
+          <h4>{{ meal.title }}</h4>
+          <p class="meal-price">{{ meal.price | currency:'EUR':'symbol':'1.2-2' }}</p>
+          <p class="meal-servings">Available: {{ meal.servings }}</p>
+          <div class="meal-action-horizontal">
+            <input type="number" [(ngModel)]="meal.selectedQty" min="1" max="{{ meal.servings }}" />
+            <button class="add-btn" (click)="addMealFromCard(meal)">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Summary -->
+  <div class="summary-card" *ngIf="cartItems.length > 0">
+    <h3>Order Summary</h3>
+    <div class="summary-row">
+      <span>Sub Total:</span>
+      <span>{{ cartTotals.subTotal | currency:'EUR':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="summary-row">
+      <span>Tax:</span>
+      <span>{{ cartTotals.tax ?? 0 | currency:'EUR':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="summary-row total">
+      <span>Total:</span>
+      <span>{{ cartTotals.total | currency:'EUR':'symbol':'1.2-2' }}</span>
+    </div>
+    <button class="next-btn" (click)="proceedToInfo()" [disabled]="cartItems.length === 0">Next: Customer Info</button>
+  </div>
+</div>
+  

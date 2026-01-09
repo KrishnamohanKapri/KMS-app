@@ -1,0 +1,333 @@
+@startuml KMS_ERD
+
+title Kitchen Management System (KMS) - Complete ERD
+
+' User Management
+class User {
+  _id
+  firstName: String
+  lastName: String
+  email: String (unique)
+  password: String
+  role: String (enum: user, admin, chef)
+  profileImage: String
+  isActive: Boolean
+  status: String (enum: active, inactive)
+  kitchenNo: String
+  createdAt: Date
+}
+
+class Attendance {
+  _id
+  user: ObjectId
+  date: Date
+  isPresent: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Newsletter
+class Newsletter {
+  _id
+  email: String (unique)
+  isSubscribed: Boolean
+  createdAt: Date
+}
+
+' Meals & Categories
+class Category {
+  _id
+  name: String
+  description: String
+  createdAt: Date
+}
+
+class Meal {
+  _id
+  title: String
+  description: String
+  servings: Number
+  price: Number
+  category: ObjectId
+  images: [String]
+  isActive: Boolean
+  nutritionalInfo: ObjectId
+  dietaryInfo: ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Nutritional & Dietary Information
+class NutritionalInfo {
+  _id
+  calories: Number
+  protein: Number
+  carbohydrates: Number
+  fat: Number
+  fiber: Number
+  sugar: Number
+  sodium: Number
+  createdAt: Date
+  updatedAt: Date
+}
+
+class DietaryInfo {
+  _id
+  isVegetarian: Boolean
+  isVegan: Boolean
+  isGlutenFree: Boolean
+  isDairyFree: Boolean
+  isNutFree: Boolean
+  isHalal: Boolean
+  isKosher: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Allergens
+class Allergen {
+  _id
+  name: String
+  description: String
+  createdAt: Date
+}
+
+class MealAllergen {
+  _id
+  mealId: ObjectId
+  allergenId: ObjectId
+  createdAt: Date
+}
+
+' Ingredients & Stock Management
+class Ingredient {
+  _id
+  name: String (unique)
+  description: String
+  category: String (enum: vegetable, fruit, meat, dairy, grain, spice, herb, other)
+  stock: Number
+  baseUnit: String (enum: g, kg, ml, l, tbsp, tsp, cup, piece, slice, whole)
+  packagingUnit: String (enum: sack, bag, box, bottle, can, jar, pack, bundle, carton, piece, whole)
+  packagingQuantity: Number
+  costPerPackage: Number
+  reorderLevel: Number
+  isActive: Boolean
+  unit: String (legacy)
+  costPerUnit: Number (legacy)
+  createdAt: Date
+  updatedAt: Date
+}
+
+class IngredientBatch {
+  _id
+  ingredientId: ObjectId
+  packageQuantity: Number
+  baseUnitQuantity: Number
+  expiryDate: Date
+  receivedDate: Date
+  batchNumber: String
+  costPerPackage: Number
+  supplier: String
+  purchaseOrder: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+class MealIngredient {
+  _id
+  mealId: ObjectId
+  ingredientId: ObjectId
+  quantity: Number
+  unit: String
+  createdAt: Date
+}
+
+' Tags
+class Tag {
+  _id
+  name: String
+  description: String
+  createdAt: Date
+}
+
+class MealTag {
+  _id
+  mealId: ObjectId
+  tagId: ObjectId
+  createdAt: Date
+}
+
+' Meal Planning
+class MealPlan {
+  _id
+  date: Date
+  startDate: Date
+  endDate: Date
+  meals: [Object]
+  type: String (enum: day, week)
+  createdBy: ObjectId
+  assignedStaff: [ObjectId]
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Customer Management
+class Customer {
+  _id
+  customerId: String (unique)
+  user: ObjectId
+  billingFirstName: String
+  billingLastName: String
+  billingEmail: String
+  billingPhone: String
+  billingStreet: String
+  billingCity: String
+  billingState: String
+  billingZipCode: String
+  billingCountry: String
+  billingCompany: String
+  billingTaxId: String
+  dietaryRestrictions: [String]
+  allergies: [String]
+  preferredPaymentMethod: String
+  newsletterSubscription: Boolean
+  marketingEmails: Boolean
+  loyaltyPoints: Number
+  totalOrders: Number
+  totalSpent: Number
+  status: String (enum: active, inactive, suspended)
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Payment Management
+class Payment {
+  _id
+  paymentId: String (unique)
+  order: ObjectId
+  customer: ObjectId
+  amount: Number
+  currency: String
+  type: String (enum: paypal, stripe, card)
+  method: String (enum: credit_card, debit_card, paypal_wallet, stripe_wallet)
+  status: String (enum: pending, processing, completed, failed, refunded, cancelled)
+  cardType: String
+  last4Digits: String
+  cardBrand: String
+  transactionId: String
+  paymentIntentId: String
+  bankName: String
+  accountNumber: String
+  routingNumber: String
+  cryptoType: String
+  walletAddress: String
+  billingStreet: String
+  billingCity: String
+  billingState: String
+  billingZipCode: String
+  billingCountry: String
+  processingFee: Number
+  taxAmount: Number
+  discountAmount: Number
+  ipAddress: String
+  userAgent: String
+  deviceType: String
+  location: String
+  refundedAmount: Number
+  refundReason: String
+  refundedAt: Date
+  refundTransactionId: String
+  notes: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Orders
+class Order {
+  _id
+  orderId: String (unique)
+  user: ObjectId
+  customer: ObjectId
+  payment: ObjectId
+  meals: [Object]
+  total: Number
+  subTotal: Number
+  tax: Number
+  deliveryFee: Number
+  discount: Number
+  billingInfo: Object
+  deliveryStreet: String
+  deliveryCity: String
+  deliveryState: String
+  deliveryZipCode: String
+  deliveryCountry: String
+  deliveryInstructions: String
+  status: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  estimatedDeliveryTime: Date
+  actualDeliveryTime: Date
+  specialInstructions: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Order History Tracking
+class OrderHistory {
+  _id
+  orderId: ObjectId
+  userId: ObjectId
+  status: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  previousStatus: String (enum: pending, confirmed, preparing, ready, delivered, cancelled)
+  orderNumber: String
+  totalAmount: Number
+  changedBy: ObjectId
+  notes: String
+  changedAt: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Notifications
+class Notification {
+  _id
+  userId: ObjectId
+  title: String
+  message: String
+  type: String
+  isRead: Boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+' Relationships
+User ||--|| Customer : "has"
+User ||--o{ Attendance : "has"
+User ||--o{ Order : "places"
+User ||--o{ Notification : "receives"
+User ||--o{ MealPlan : "creates"
+User ||--o{ MealPlan : "assigned_to"
+
+Customer ||--o{ Order : "places"
+Customer ||--o{ Payment : "makes"
+Order ||--|| Payment : "has"
+Order ||--o{ OrderHistory : "tracks"
+User ||--o{ OrderHistory : "changes"
+
+Category ||--o{ Meal : "categorizes"
+Meal ||--o{ MealAllergen : "has"
+Allergen ||--o{ MealAllergen : "belongs_to"
+Meal ||--o{ MealIngredient : "contains"
+Ingredient ||--o{ MealIngredient : "used_in"
+Meal ||--o{ MealTag : "tagged_with"
+Tag ||--o{ MealTag : "applied_to"
+
+Meal ||--o{ MealPlan : "planned_in"
+Meal ||--o{ Order : "ordered_in"
+
+Ingredient ||--o{ IngredientBatch : "has_batches"
+
+Meal ||--|| NutritionalInfo : "has"
+Meal ||--|| DietaryInfo : "has"
+
+@enduml 

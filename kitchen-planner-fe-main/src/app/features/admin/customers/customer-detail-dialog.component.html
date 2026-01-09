@@ -1,0 +1,105 @@
+<h2 mat-dialog-title>
+  <mat-icon color="primary">person</mat-icon>
+  Customer Details
+</h2>
+
+<mat-dialog-content>
+  <!-- User Info Section -->
+  <section class="section-card">
+    <h3><mat-icon color="primary">account_circle</mat-icon> User Info</h3>
+    <p><mat-icon>person</mat-icon> <strong>Name:</strong> {{ data.user.firstName }} {{ data.user.lastName }}</p>
+    <p><mat-icon>email</mat-icon> <strong>Email:</strong> {{ data.user.email }}</p>
+    <p><mat-icon>verified_user</mat-icon> <strong>Status:</strong> {{ data.status }}</p>
+    <p><mat-icon>fingerprint</mat-icon> <strong>Customer ID:</strong> {{ data.customerId }}</p>
+    <p><mat-icon>calendar_today</mat-icon> <strong>Created At:</strong> {{ data.createdAt | date:'medium' }}</p>
+  </section>
+
+  <!-- Billing Info Section -->
+  <section class="section-card">
+    <h3><mat-icon color="primary">home</mat-icon> Billing Info</h3>
+    <p><mat-icon>person</mat-icon> <strong>Name:</strong> {{ data.billingInfo.firstName }} {{ data.billingInfo.lastName }}</p>
+    <p><mat-icon>email</mat-icon> <strong>Email:</strong> {{ data.billingInfo.email }}</p>
+    <p><mat-icon>phone</mat-icon> <strong>Phone:</strong> {{ data.billingInfo.phone }}</p>
+    <p><mat-icon>business</mat-icon> <strong>Company:</strong> {{ data.billingInfo.company || 'N/A' }}</p>
+    <p><mat-icon>assignment_ind</mat-icon> <strong>Tax ID:</strong> {{ data.billingInfo.taxId || 'N/A' }}</p>
+    <p><mat-icon>location_on</mat-icon> <strong>Address:</strong> 
+      {{ data.billingInfo.address.street }},
+      {{ data.billingInfo.address.city }},
+      {{ data.billingInfo.address.state }},
+      {{ data.billingInfo.address.zipCode }},
+      {{ data.billingInfo.address.country }}
+    </p>
+  </section>
+
+  <!-- Preferences Section -->
+  <section class="section-card">
+    <h3><mat-icon color="primary">list_alt</mat-icon> Preferences</h3>
+    <p><strong>Dietary Restrictions:</strong>
+      <span *ngIf="data.preferences.dietaryRestrictions?.length; else noDiet">
+        {{ data.preferences.dietaryRestrictions.join(', ') }}
+      </span>
+      <ng-template #noDiet>N/A</ng-template>
+    </p>
+    <p><strong>Allergies:</strong>
+      <span *ngIf="data.preferences.allergies?.length; else noAllergy">
+        {{ data.preferences.allergies.join(', ') }}
+      </span>
+      <ng-template #noAllergy>N/A</ng-template>
+    </p>
+    <p><strong>Preferred Payment Method:</strong> {{ data.preferences.preferredPaymentMethod }}</p>
+    <p><strong>Newsletter Subscription:</strong> {{ data.preferences.newsletterSubscription ? 'Yes' : 'No' }}</p>
+    <p><strong>Marketing Emails:</strong> {{ data.preferences.marketingEmails ? 'Yes' : 'No' }}</p>
+  </section>
+
+  <!-- Account Stats Section -->
+  <section class="section-card">
+    <h3><mat-icon color="primary">star</mat-icon> Account Stats</h3>
+    <p><mat-icon>loyalty</mat-icon> <strong>Loyalty Points:</strong> {{ data.loyaltyPoints }}</p>
+    <p><mat-icon>shopping_cart</mat-icon> <strong>Total Orders:</strong> {{ data.totalOrders }}</p>
+    <p><mat-icon>attach_money</mat-icon> <strong>Total Spent:</strong> €{{ data.totalSpent }}</p>
+  </section>
+
+  <!-- Payments Section -->
+  <section class="section-card" *ngIf="data.payments?.length">
+    <h3><mat-icon color="primary">payment</mat-icon> Payments</h3>
+    <table mat-table [dataSource]="data.payments" class="mat-elevation-z1 modern-payment-table">
+      <ng-container matColumnDef="cardType">
+        <th mat-header-cell *matHeaderCellDef>Card Type</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.paymentDetails?.cardType | titlecase }}</td>
+      </ng-container>
+      <ng-container matColumnDef="transactionId">
+        <th mat-header-cell *matHeaderCellDef>Transaction ID</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.paymentDetails?.transactionId }}</td>
+      </ng-container>
+      <ng-container matColumnDef="processingFee">
+        <th mat-header-cell *matHeaderCellDef>Processing Fee (€)</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.fees?.processingFee }}</td>
+      </ng-container>
+      <ng-container matColumnDef="orderId">
+        <th mat-header-cell *matHeaderCellDef>Order ID</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.order?._id }}</td>
+      </ng-container>
+      <ng-container matColumnDef="orderStatus">
+        <th mat-header-cell *matHeaderCellDef>Order Status</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.order?.status | titlecase }}</td>
+      </ng-container>
+      <ng-container matColumnDef="orderTotal">
+        <th mat-header-cell *matHeaderCellDef>Order Total (€)</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.order?.total }}</td>
+      </ng-container>
+      <ng-container matColumnDef="paymentStatus">
+        <th mat-header-cell *matHeaderCellDef>Payment Status</th>
+        <td mat-cell *matCellDef="let payment">{{ payment.status | titlecase }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['cardType','transactionId','processingFee','orderId','orderStatus','orderTotal','paymentStatus']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['cardType','transactionId','processingFee','orderId','orderStatus','orderTotal','paymentStatus']"></tr>
+    </table>
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" mat-dialog-close>
+    <mat-icon>close</mat-icon> Close
+  </button>
+</mat-dialog-actions>

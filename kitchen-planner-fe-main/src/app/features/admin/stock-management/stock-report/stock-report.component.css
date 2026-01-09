@@ -1,0 +1,54 @@
+.report-container {
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: #e2e9e8;
+  color: #00796b;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.card span {
+  display: block;
+  font-size: 1.3rem;
+  margin-top: 0.25rem;
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+table th, table td {
+  padding: 0.75rem;
+  text-align: center;
+}
+
+table thead {
+  background: #00796b;
+  color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #00796b;
+}

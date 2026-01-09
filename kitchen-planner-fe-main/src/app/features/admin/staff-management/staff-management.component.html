@@ -1,0 +1,57 @@
+<div class="page-container staff-management-container">
+  <h2>Staff Management</h2>
+
+  <!-- Header: Search + Add Staff -->
+  <div class="staff-header">
+    <mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Search Staff</mat-label>
+      <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilter()" placeholder="Search by name or email" />
+      <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''; applyFilter()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="add-staff-btn" (click)="openAddStaff()">
+      Create Staff
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="pagedStaff.length > 0" class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let staff of pagedStaff">
+          <td>{{staff.firstName}} {{staff.lastName}}</td>
+          <td>{{staff.email}}</td>
+          <td>{{staff.role | titlecase}}</td>
+          <td>{{staff.isActive ? 'Active' : 'Inactive'}}</td>
+          <td>{{staff.createdAt | date:'medium'}}</td>
+          <td>
+            <button mat-button color="primary" (click)="openEditStaff(staff)"><mat-icon>edit</mat-icon></button>
+            <button mat-button color="warn" (click)="deleteStaff(staff._id)"><mat-icon>delete</mat-icon></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Paginator -->
+    <mat-paginator [length]="filteredStaff.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
+
+  <!-- Empty Message -->
+  <div *ngIf="pagedStaff.length === 0" class="empty-msg">
+    ✅ No staff found
+  </div>
+</div>

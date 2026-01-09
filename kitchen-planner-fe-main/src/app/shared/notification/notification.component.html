@@ -1,0 +1,24 @@
+<app-navbar></app-navbar>
+<div class="notification-page">
+  <h2>Notifications</h2>
+  <p *ngIf="unreadCount > 0">You have {{ unreadCount }} unread notification(s)</p>
+
+  <div *ngIf="notifications.length === 0" class="empty">
+    No notifications
+  </div>
+
+  <ul class="notification-list">
+    <li 
+      *ngFor="let notification of notifications" 
+      [class.unread]="!notification.isRead"
+      [ngClass]="notification.type"
+      (click)="openNotification(notification)">
+      
+      <div class="notification-item">
+        <h4>{{ notification.title }}</h4>
+        <p>{{ notification.message }}</p>
+        <small>{{ getRelativeTime(notification.createdAt) }}</small>
+      </div>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,6602 @@
+openapi: 3.0.3
+info:
+  title: KMS - Kitchen Management System API
+  description: Complete API collection for KMS backend including authentication, meals, meal planning, orders, customers, payments, and dashboard
+  version: 2.0.0
+  contact:
+    name: Research Project Tu Ilmenau
+    email: anas-ur-rasheed.abid@tu-ilmenau.de
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/tuilmenau/kms-api/1.0.0
+  - url: http://localhost:8001
+    description: Development server
+  - url: https://kitchen-planner-be.onrender.com/
+    description: Production URL
+
+tags:
+  - name: authentication
+    description: User authentication and profile management
+  - name: meals
+    description: Meal and category management
+  - name: meal-planning
+    description: Daily and weekly meal planning
+  - name: chef-management
+    description: Chef operations and attendance
+  - name: customer-management
+    description: Customer data and preferences
+  - name: orders
+    description: Order processing and management
+  - name: payments
+    description: Payment processing and refunds
+  - name: dashboard
+    description: Analytics and statistics
+  - name: newsletter
+    description: Newsletter subscription
+  - name: history
+    description: Order history tracking
+  - name: stock
+    description: Ingredient stock management
+  - name: entities
+    description: Normalized entities
+  - name: notifications
+    description: System notifications
+
+paths:
+  # Authentication endpoints
+  /auth/register:
+    post:
+      tags:
+        - authentication
+      summary: Register a new user
+      description: Register a new user or chef in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+            examples:
+              user:
+                summary: Register regular user
+                value:
+                  firstName: John
+                  lastName: Doe
+                  email: john.doe@example.com
+                  password: password123
+                  role: user
+              chef:
+                summary: Register chef
+                value:
+                  firstName: Chef
+                  lastName: Gordon
+                  email: chef.gordon@example.com
+                  password: password123
+                  role: chef
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request
+        '409':
+          description: User already exists
+
+  /auth/login:
+    post:
+      tags:
+        - authentication
+      summary: User login
+      description: Authenticate user and return JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+
+  /auth/profile:
+    get:
+      tags:
+        - authentication
+      summary: Get user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized
+
+  /auth/profile/{userId}:
+    put:
+      tags:
+        - authentication
+      summary: Update user profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+        '401':
+          description: Unauthorized
+
+  # Password Management endpoints
+  /auth/forgot-password:
+    post:
+      tags:
+        - authentication
+      summary: Request password reset
+      description: Send password reset email to user's email address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                  description: User's email address
+      responses:
+        '200':
+          description: Password reset email sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password reset email sent successfully"
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Password reset email has been sent to your email address"
+        '400':
+          description: Bad request - Email is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Email is required"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "User not found with this email"
+
+  /auth/reset-password/{token}:
+    post:
+      tags:
+        - authentication
+      summary: Reset password using token
+      description: Reset user password using the reset token from email
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Password reset token from email
+          example: "abc123def456ghi789"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  minLength: 6
+                  example: "newpassword123"
+                  description: New password for the account
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password reset successful"
+                  data:
+                    type: object
+                    nullable: true
+                    example: null
+        '400':
+          description: Bad request - New password is required or invalid token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "New password is required"
+
+  /auth/change-password:
+    post:
+      tags:
+        - authentication
+      summary: Change password for logged-in user
+      description: Change password for authenticated user (requires current password verification)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  example: "oldpassword123"
+                  description: Current password for verification
+                newPassword:
+                  type: string
+                  minLength: 6
+                  example: "newpassword123"
+                  description: New password for the account
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password changed successfully"
+                  data:
+                    type: object
+                    nullable: true
+                    example: null
+        '400':
+          description: Bad request - Passwords are required or current password is incorrect
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Current password and new password are required"
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "Access denied. No token provided."
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: "User not found"
+  # Staff Management endpoints (Admin only)
+  /auth/staff:
+    post:
+      tags:
+        - authentication
+      summary: Create staff account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+      responses:
+        '201':
+          description: Staff account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+
+    get:
+      tags:
+        - authentication
+      summary: Get all staff accounts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [chef, admin, user]
+      responses:
+        '200':
+          description: Staff accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+
+  /auth/staff/{id}:
+    put:
+      tags:
+        - authentication
+      summary: Update staff account
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffUpdate'
+      responses:
+        '200':
+          description: Staff account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Staff account not found
+
+    delete:
+      tags:
+        - authentication
+      summary: Delete staff account
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+      responses:
+        '200':
+          description: Staff account deleted successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Staff account not found
+
+  # Meals Management endpoints
+  /meals/category:
+    post:
+      tags:
+        - meals
+      summary: Create meal category
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreate'
+      responses:
+        '200':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '401':
+          description: Unauthorized
+
+  /meals/category/get:
+    get:
+      tags:
+        - meals
+      summary: Get all meal categories
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /meals/category/{id}:
+    put:
+      tags:
+        - meals
+      summary: Update meal category
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Category not found
+
+    delete:
+      tags:
+        - meals
+      summary: Delete meal category
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+      responses:
+        '200':
+          description: Category deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Category not found
+
+  /meals:
+    post:
+      tags:
+        - meals
+      summary: Create a new meal
+      description: Create a new meal with images, ingredients, allergens, and tags
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - servings
+                - price
+                - category
+                - tags
+                - ingredients
+                - allergens
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  example: "Grilled Chicken Breast"
+                  description: Meal title
+                description:
+                  type: string
+                  minLength: 10
+                  maxLength: 500
+                  example: "Juicy grilled chicken breast with herbs"
+                  description: Meal description
+                servings:
+                  type: number
+                  minimum: 1
+                  maximum: 1000
+                  example: 2
+                  description: Number of servings this meal provides
+                price:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  maximum: 999.99
+                  example: 25.99
+                  description: Price per serving
+                category:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                  description: Category ID
+                tags:
+                  type: string
+                  description: JSON string array of tag names. Must be valid JSON format with double quotes.
+                  example: '["healthy", "protein"]'
+                ingredients:
+                  type: string
+                  description: Array of ingredient names. Can be sent as array of strings or JSON string array. If using JSON string, must be valid JSON format with double quotes (e.g., '["chicken breast", "olive oil"]'). Default quantity of 50g per serving will be used unless ingredientQuantities and ingredientUnits are provided.
+                  example: '["chicken breast", "olive oil"]'
+                ingredientQuantities:
+                  type: string
+                  description: Array of ingredient quantities per serving. Can be sent as array of numbers or JSON string array. Must match the order of ingredients array. If not provided, default quantity of 50g per serving will be used.
+                  example: '[150, 15]'
+                ingredientUnits:
+                  type: string
+                  description: Array of ingredient units. Can be sent as array of strings or JSON string array. Must match the order of ingredients array. If not provided, default unit of 'g' will be used.
+                  example: '["g", "ml"]'
+                allergens:
+                  type: string
+                  description: JSON string array of allergen names. Must be valid JSON format with double quotes.
+                  example: '["none"]'
+                mealImage:
+                  type: string
+                  format: binary
+                  description: Single image file for the meal. Supports JPG, PNG, WebP, GIF formats up to 10MB.
+      responses:
+        '201':
+          description: Meal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Bad request - Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: Payload too large - Image file too big
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - Invalid data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - meals
+      summary: Get all meals with pagination and filters
+      description: Retrieve all active meals with search, category filtering, and pagination.
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of meals per page
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 200
+          description: Search meals by title
+        - name: category
+          in: query
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$|^all$'
+          description: Filter by category ID or 'all' for all categories
+      responses:
+        '200':
+          description: Meals retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meals retrieved successfully"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        servings:
+                          type: number
+                        price:
+                          type: number
+                        category:
+                          $ref: '#/components/schemas/Category'
+                        images:
+                          type: array
+                          items:
+                            type: string
+                        isActive:
+                          type: boolean
+                        allergens:
+                          type: array
+                          items:
+                            type: object
+                        ingredients:
+                          type: array
+                          items:
+                            type: object
+                        tags:
+                          type: array
+                          items:
+                            type: object
+                        availability:
+                          type: object
+                          properties:
+                            available:
+                              type: boolean
+                            availableServings:
+                              type: number
+                            totalCost:
+                              type: number
+                            missingIngredients:
+                              type: array
+                              items:
+                                type: string
+                            lowStockIngredients:
+                              type: array
+                              items:
+                                type: string
+
+  /meals/{mealId}:
+    get:
+      tags:
+        - meals
+      summary: Get meal by ID
+      description: Retrieve a specific meal with all related data and availability information
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal ID
+      responses:
+        '200':
+          description: Meal retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal retrieved successfully"
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      servings:
+                        type: number
+                      price:
+                        type: number
+                      category:
+                        $ref: '#/components/schemas/Category'
+                      images:
+                        type: array
+                        items:
+                          type: string
+                      isActive:
+                        type: boolean
+                      allergens:
+                        type: array
+                        items:
+                          type: object
+                      ingredients:
+                        type: array
+                        items:
+                          type: object
+                      tags:
+                        type: array
+                        items:
+                          type: object
+                      availability:
+                        type: object
+                        properties:
+                          available:
+                            type: boolean
+                          availableServings:
+                            type: number
+                          totalCost:
+                            type: number
+                          missingIngredients:
+                            type: array
+                            items:
+                              type: string
+                          lowStockIngredients:
+                            type: array
+                            items:
+                              type: string
+        '404':
+          description: Meal not found
+
+    put:
+      tags:
+        - meals
+      summary: Update meal
+      description: Update meal information including images, ingredients, and tags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal ID
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                  minLength: 10
+                  maxLength: 500
+                  example: "Juicy grilled chicken breast with herbs"
+                  description: Meal description
+                servings:
+                  type: number
+                  minimum: 1
+                  maximum: 1000
+                  example: 2
+                  description: Number of servings this meal provides
+                price:
+                  type: number
+                  format: float
+                  minimum: 0.01
+                  maximum: 999.99
+                  example: 25.99
+                  description: Price per serving
+                stock:
+                  type: number
+                  minimum: 0
+                  maximum: 10000
+                  example: 100
+                  description: Available stock quantity
+                discount:
+                  type: number
+                  format: float
+                  minimum: 0
+                  maximum: 100
+                  example: 10.0
+                  description: Discount percentage
+                category:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                  description: Category ID
+                tags:
+                  type: string
+                  description: JSON string array of tag names. Must be valid JSON format with double quotes.
+                  example: '["healthy", "protein"]'
+                ingredients:
+                  type: string
+                  description: Array of ingredient names. Can be sent as array of strings or JSON string array. If using JSON string, must be valid JSON format with double quotes (e.g., '["chicken breast", "olive oil"]'). Default quantity of 50g per serving will be used unless ingredientQuantities and ingredientUnits are provided.
+                  example: '["chicken breast", "olive oil"]'
+                ingredientQuantities:
+                  type: string
+                  description: Array of ingredient quantities per serving. Can be sent as array of numbers or JSON string array. Must match the order of ingredients array. If not provided, default quantity of 50g per serving will be used.
+                  example: '[150, 15]'
+                ingredientUnits:
+                  type: string
+                  description: Array of ingredient units. Can be sent as array of strings or JSON string array. Must match the order of ingredients array. If not provided, default unit of 'g' will be used.
+                  example: '["g", "ml"]'
+                allergens:
+                  type: string
+                  description: JSON string array of allergen names. Must be valid JSON format with double quotes.
+                  example: '["none"]'
+                previousImages:
+                  type: string
+                  description: JSON string array of existing image paths. Must be valid JSON format with double quotes.
+                  example: '["/uploads/image1.jpg", "/uploads/image2.jpg"]'
+                images:
+                  type: string
+                  format: binary
+                  description: New image file(s) for the meal. Multiple images can be uploaded by selecting multiple files.
+      responses:
+        '200':
+          description: Meal updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal updated successfully"
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      title:
+                        type: string
+                      description:
+                        type: string
+                      servings:
+                        type: number
+                      price:
+                        type: number
+                      category:
+                        $ref: '#/components/schemas/Category'
+                      images:
+                        type: array
+                        items:
+                          type: string
+                      isActive:
+                        type: boolean
+                      allergens:
+                        type: array
+                        items:
+                          type: object
+                      ingredients:
+                        type: array
+                        items:
+                          type: object
+                      tags:
+                        type: array
+                        items:
+                          type: object
+                      availability:
+                        type: object
+                        properties:
+                          available:
+                            type: boolean
+                          availableServings:
+                            type: number
+                          totalCost:
+                            type: number
+                          missingIngredients:
+                            type: array
+                            items:
+                              type: string
+                          lowStockIngredients:
+                            type: array
+                            items:
+                              type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Meal not found
+
+    delete:
+      tags:
+        - meals
+      summary: Delete meal
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meal deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Meal not found
+
+  # Meal Planning endpoints
+  /planning/meal-plans:
+    post:
+      tags:
+        - meal-planning
+      summary: Create meal plan (daily or weekly)
+      description: Create a new meal plan for a specific day or week with assigned meals and staff. Stock will be automatically deducted from ingredients when the meal plan is created. The deduction is proportional to the servings requested - if a meal serves 10 people and you request 5 servings, only 50% of the ingredient quantities will be deducted.**
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - meals
+                - assignedStaff
+                - notes
+                - createdBy
+              properties:
+                date:
+                  type: string
+                  format: date
+                  description: Date for daily plans (required when type is 'day') (YYYY-MM-DD)
+                  example: "2024-01-15"
+                startDate:
+                  type: string
+                  format: date
+                  description: Start date for weekly plans (required when type is 'week') (YYYY-MM-DD)
+                  example: "2024-01-15"
+                endDate:
+                  type: string
+                  format: date
+                  description: End date for weekly plans (required when type is 'week') (YYYY-MM-DD)
+                  example: "2024-01-21"
+                type:
+                  type: string
+                  enum: [day, week]
+                  example: day
+                  description: Type of meal plan
+                meals:
+                  type: array
+                  minItems: 1
+                  maxItems: 50
+                  items:
+                    type: object
+                    required:
+                      - mealId
+                      - servings
+                    properties:
+                      mealId:
+                        type: string
+                        pattern: '^[0-9a-fA-F]{24}$'
+                        example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                        description: Meal ID
+                      servings:
+                        type: number
+                        minimum: 1
+                        maximum: 1000
+                        example: 50
+                        description: Number of servings needed
+                  description: Array of meals with their required servings
+                assignedStaff:
+                  type: array
+                  minItems: 1
+                  maxItems: 20
+                  items:
+                    type: string
+                    pattern: '^[0-9a-fA-F]{24}$'
+                  description: Array of user IDs for assigned staff
+                notes:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: "Daily meal plan for restaurant operations"
+                  description: Additional notes for the meal plan
+                createdBy:
+                  type: string
+                  pattern: '^[0-9a-fA-F]{24}$'
+                  description: User ID of the creator
+      responses:
+        '201':
+          description: Meal plan created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal plan created successfully"
+                  data:
+                    $ref: '#/components/schemas/MealPlan'
+        '400':
+          description: Bad request - Missing required fields or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Meal plan already exists for this date/period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - Invalid data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - meal-planning
+      summary: Get meal plans with filters
+      description: Retrieve meal plans based on date, type, or date range filters
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [day, week]
+          description: Filter by plan type
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2024-01-15"
+          description: Specific date to search for (YYYY-MM-DD)
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2024-01-15"
+          description: Start date for range search (YYYY-MM-DD)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2024-01-21"
+          description: End date for range search (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Meal plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal plans retrieved successfully"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MealPlan'
+        '401':
+          description: Unauthorized
+
+  /planning/meal-plans/{mealPlanId}/check-stock:
+    get:
+      tags:
+        - meal-planning
+      summary: Check stock for meal plan
+      description: Check if all required ingredients are available for a specific meal plan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealPlanId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal plan ID
+      responses:
+        '200':
+          description: Stock check completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Stock check completed"
+                  data:
+                    $ref: '#/components/schemas/StockCheckResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Meal plan not found
+
+  /planning/meal-plans/{mealPlanId}/check-resources:
+    get:
+      tags:
+        - meal-planning
+      summary: Check resources for meal plan
+      description: Check if all required resources are available for a specific meal plan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealPlanId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal plan ID
+      responses:
+        '200':
+          description: Resource check completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Resource check completed"
+                  data:
+                    $ref: '#/components/schemas/ResourceCheckResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Meal plan not found
+
+  /planning/meal-plans/{mealPlanId}:
+    get:
+      tags:
+        - meal-planning
+      summary: Get meal plan by ID
+      description: Retrieve a specific meal plan with all details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealPlanId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal plan ID
+      responses:
+        '200':
+          description: Meal plan retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal plan retrieved successfully"
+                  data:
+                    $ref: '#/components/schemas/MealPlan'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Meal plan not found
+
+    put:
+      tags:
+        - meal-planning
+      summary: Update meal plan
+      description: Update an existing meal plan. Stock will be automatically adjusted - restored from old meals and deducted from new meals. The adjustment is proportional to the servings requested.**
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealPlanId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal plan ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                  example: "2024-01-15"
+                  description: Date for daily plans (YYYY-MM-DD)
+                startDate:
+                  type: string
+                  format: date
+                  example: "2024-01-15"
+                  description: Start date for weekly plans (YYYY-MM-DD)
+                endDate:
+                  type: string
+                  format: date
+                  example: "2024-01-21"
+                  description: End date for weekly plans (YYYY-MM-DD)
+                meals:
+                  type: array
+                  minItems: 1
+                  maxItems: 50
+                  items:
+                    type: object
+                    required:
+                      - mealId
+                      - servings
+                    properties:
+                      mealId:
+                        type: string
+                        pattern: '^[0-9a-fA-F]{24}$'
+                        example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                        description: Meal ID
+                      servings:
+                        type: number
+                        minimum: 1
+                        maximum: 1000
+                        example: 50
+                        description: Number of servings needed
+                  description: Array of meals with their required servings
+                assignedStaff:
+                  type: array
+                  minItems: 1
+                  maxItems: 20
+                  items:
+                    type: string
+                    pattern: '^[0-9a-fA-F]{24}$'
+                    example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                  description: Array of user IDs for assigned staff
+                notes:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: "Updated meal plan for restaurant operations"
+                  description: Additional notes for the meal plan
+      responses:
+        '200':
+          description: Meal plan updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal plan updated successfully"
+                  data:
+                    $ref: '#/components/schemas/MealPlan'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Meal plan not found
+
+    delete:
+      tags:
+        - meal-planning
+      summary: Delete meal plan
+      description: Delete a meal plan. Stock will be automatically restored from all meals in the plan. The restoration is proportional to the servings that were planned.**
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealPlanId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal plan ID
+      responses:
+        '200':
+          description: Meal plan deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal plan deleted successfully"
+                  data:
+                    type: object
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Meal plan not found
+
+  /planning/available-meals:
+    get:
+      tags:
+        - meal-planning
+      summary: Get available meals for planning
+      description: Retrieve all meals that are available for meal planning
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Available meals retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Available meals retrieved successfully"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Meal'
+        '401':
+          description: Unauthorized
+
+  /planning/meal-plans/{mealPlanId}/duplicate:
+    post:
+      tags:
+        - meal-planning
+      summary: Duplicate meal plan
+      description: Create a copy of an existing meal plan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealPlanId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: Meal plan ID to duplicate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newDate:
+                  type: string
+                  format: date
+                  example: "2024-01-22"
+                  description: New date for the duplicated plan (YYYY-MM-DD)
+                newStartDate:
+                  type: string
+                  format: date
+                  example: "2024-01-22"
+                  description: New start date for weekly plans (YYYY-MM-DD)
+                newEndDate:
+                  type: string
+                  format: date
+                  example: "2024-01-28"
+                  description: New end date for weekly plans (YYYY-MM-DD)
+      responses:
+        '201':
+          description: Meal plan duplicated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Meal plan duplicated successfully"
+                  data:
+                    $ref: '#/components/schemas/MealPlan'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Admin access required
+        '404':
+          description: Meal plan not found
+
+  # Chef Management endpoints
+  /chef:
+    get:
+      tags:
+        - chef-management
+      summary: Get all chefs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Chefs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chef'
+
+  /chef/{chefId}:
+    get:
+      tags:
+        - chef-management
+      summary: Get chef by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chefId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chef retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chef'
+
+  /chef/attendance/mark:
+    get:
+      tags:
+        - chef-management
+      summary: Mark attendance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Attendance marked successfully
+
+  /chef/low-stock/{mealId}:
+    get:
+      tags:
+        - chef-management
+      summary: Check low stock for meal
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Low stock check completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LowStockResponse'
+
+  /chef/get-attendance/{userId}:
+    post:
+      tags:
+        - chef-management
+      summary: Get attendance records
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Attendance records retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceResponse'
+
+  # Customer Management endpoints
+  /customer:
+    post:
+      tags:
+        - customer-management
+      summary: Create customer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerCreate'
+      responses:
+        '200':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+
+    get:
+      tags:
+        - customer-management
+      summary: Get all customers (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive]
+      responses:
+        '200':
+          description: Customers retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerListResponse'
+
+  /customer/{customerId}:
+    get:
+      tags:
+        - customer-management
+      summary: Get customer by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+    put:
+      tags:
+        - customer-management
+      summary: Update customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdate'
+      responses:
+        '200':
+          description: Customer updated successfully
+
+    delete:
+      tags:
+        - customer-management
+      summary: Delete customer (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer deleted successfully
+
+  /customer/user/{userId}:
+    get:
+      tags:
+        - customer-management
+      summary: Get customer by user ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+  /customer/{customerId}/billing:
+    put:
+      tags:
+        - customer-management
+      summary: Update billing information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingInfoUpdate'
+      responses:
+        '200':
+          description: Billing info updated successfully
+
+  /customer/{customerId}/preferences:
+    put:
+      tags:
+        - customer-management
+      summary: Update customer preferences
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencesUpdate'
+      responses:
+        '200':
+          description: Preferences updated successfully
+
+  /customer/{customerId}/loyalty-points:
+    post:
+      tags:
+        - customer-management
+      summary: Add loyalty points (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyPointsAdd'
+      responses:
+        '200':
+          description: Loyalty points added successfully
+
+  /customer/stats:
+    get:
+      tags:
+        - customer-management
+      summary: Get customer statistics (Admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Customer statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerStats'
+
+  # Orders endpoints
+  /order/cart/checkout:
+    post:
+      tags:
+        - orders
+      summary: Calculate order total
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '200':
+          description: Total calculated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutResponse'
+
+  /order:
+    post:
+      tags:
+        - orders
+      summary: Create order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreate'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Bad request - Validation error or insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Order already exists or insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - Invalid data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - orders
+      summary: Get all orders
+      description: Retrieve all orders with search, pagination, and role-based filtering
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            maximum: 1000
+          description: Page number for pagination (1-1000)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of orders per page (1-100)
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 200
+          description: Search orders by user name, email, or orderId
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListResponse'
+
+  /order/{orderId}:
+    get:
+      tags:
+        - orders
+      summary: Get order by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /order/update-status/{orderId}:
+    put:
+      tags:
+        - orders
+      summary: Update order status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderStatusUpdate'
+      responses:
+        '200':
+          description: Order status updated successfully
+
+  # Payment endpoints
+  /payment:
+    post:
+      tags:
+        - payments
+      summary: Create payment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentCreate'
+      responses:
+        '201':
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Bad request - Validation error or payment processing failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - Payment already exists or duplicate transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - Invalid data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    get:
+      tags:
+        - payments
+      summary: Get all payments (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            maximum: 1000
+          description: Page number for pagination (1-1000)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items per page (1-100)
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, failed, refunded]
+      responses:
+        '200':
+          description: Payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentListResponse'
+
+  /payment/{paymentId}:
+    get:
+      tags:
+        - payments
+      summary: Get payment by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+    delete:
+      tags:
+        - payments
+      summary: Delete payment (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payment deleted successfully
+
+  /payment/order/{orderId}:
+    get:
+      tags:
+        - payments
+      summary: Get payments by order ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /payment/customer/{customerId}:
+    get:
+      tags:
+        - payments
+      summary: Get payments by customer ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+            maximum: 1000
+          description: Page number for pagination (1-1000)
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of items per page (1-100)
+      responses:
+        '200':
+          description: Payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentListResponse'
+
+  /payment/{paymentId}/status:
+    put:
+      tags:
+        - payments
+      summary: Update payment status (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentStatusUpdate'
+      responses:
+        '200':
+          description: Payment status updated successfully
+
+  /payment/{paymentId}/refund:
+    post:
+      tags:
+        - payments
+      summary: Process refund (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+      responses:
+        '200':
+          description: Refund processed successfully
+
+  /payment/stats:
+    get:
+      tags:
+        - payments
+      summary: Get payment statistics (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+          description: Start date for statistics (YYYY-MM-DD)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+            example: "2024-01-31"
+          description: End date for statistics (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Payment statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStats'
+
+  /payment/stripe/create-payment-intent:
+    post:
+      tags:
+        - payments
+      summary: Create Stripe payment intent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StripePaymentIntentCreate'
+      responses:
+        '200':
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StripePaymentIntentResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /payment/stripe/intent/{paymentId}/cancel:
+    delete:
+      tags:
+        - payments
+      summary: Cancel a Stripe Payment Intent (Admin)
+      description: >
+        Initiates the cancellation of a Stripe Payment Intent. This action can only be performed on intents that are not yet succeeded or already canceled.
+        The actual status update in the local database is handled by the Stripe webhook upon receiving the 'payment_intent.canceled' event.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: The internal ID of the payment record to be canceled.
+      responses:
+        '200':
+          description: Payment Intent cancellation initiated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Payment Intent cancellation initiated successfully. Status will be updated via webhook."
+                  data:
+                    type: object
+        '400':
+          description: Bad Request (e.g., invalid payment ID format, or payment cannot be canceled).
+        '401':
+          description: Unauthorized.
+
+  /payment/stripe/intent/{paymentId}/refund:
+    post:
+      tags:
+        - payments
+      summary: Refund a Stripe Payment (Admin)
+      description: >
+        Processes a full or partial refund for a completed Stripe payment.
+        If an `amount` is provided in the body, a partial refund is attempted. Otherwise, a full refund is processed.
+        The local database record for the payment and order will be updated immediately.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          description: The internal ID of the payment record to be refunded.
+      requestBody:
+        description: >
+          Specify an amount for a partial refund. If the body is empty, a full refund will be processed.
+          The `reason` can be a standard Stripe reason (`duplicate`, `fraudulent`, `requested_by_customer`) or a custom note.
+          If a standard reason is provided, it will be sent to Stripe. Otherwise, it will be stored as metadata.
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                  description: The amount to refund. Must be a positive number and less than or equal to the refundable amount.
+                  example: 25.50
+                reason:
+                  type: string
+                  description: "Optional reason for the refund. Use 'duplicate', 'fraudulent', or 'requested_by_customer' for Stripe, or provide a custom note."
+                  example: "requested_by_customer"
+      responses:
+        '200':
+          description: Refund processed successfully.
+        '400':
+          description: Bad Request (e.g., invalid payment ID, payment not completed, or refund amount invalid).
+        '404':
+          description: Payment not found.
+
+  /webhook/stripe:
+    post:
+      tags:
+        - payments
+      summary: Stripe Webhook Endpoint (Internal)
+      description: >
+        This endpoint receives webhook events from Stripe's servers.
+        **Do not call this endpoint directly.** It is used internally to handle asynchronous payment updates.
+        It handles events like `payment_intent.succeeded` to update the local database.
+      requestBody:
+        description: Stripe event object. The signature is verified from the `stripe-signature` header.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: A Stripe event object.
+              example:
+                id: "evt_12345"
+                object: "event"
+                type: "payment_intent.succeeded"
+                data:
+                  object: {}
+      responses:
+        '200':
+          description: Webhook received successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        '400':
+          description: Webhook error (e.g., invalid signature).
+
+
+  # Dashboard endpoints
+  /dashboard:
+    get:
+      tags:
+        - dashboard
+      summary: Get dashboard statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard stats retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+
+  /dashboard/income:
+    get:
+      tags:
+        - dashboard
+      summary: Get income statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Income statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomeStats'
+
+  /dashboard/orders:
+    get:
+      tags:
+        - dashboard
+      summary: Get order statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Order statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStats'
+
+  # Newsletter endpoints
+  /newsletter/subscribe:
+    post:
+      tags:
+        - newsletter
+      summary: Subscribe to newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterSubscription'
+      responses:
+        '200':
+          description: Subscribed successfully
+
+  # History endpoints
+  /history:
+    get:
+      tags:
+        - history
+      summary: Get order history
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Order history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHistoryResponse'
+
+  # Stock endpoints
+  /stock:
+    get:
+      tags:
+        - stock
+      summary: Get ingredient stock
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Stock retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockResponse'
+
+  # Entities endpoints
+  /entities:
+    get:
+      tags:
+        - entities
+      summary: Get normalized entities
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Entities retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitiesResponse'
+
+  # Notifications endpoints
+  /notification:
+    get:
+      tags:
+        - notifications
+      summary: Get all notifications for authenticated user
+      description: Retrieve all notifications for the authenticated user and mark them as read
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Notifications retrieved successfully"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        title:
+                          type: string
+                        message:
+                          type: string
+                        type:
+                          type: string
+                          enum: [info, warning, error, success]
+                        isRead:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+        '401':
+          description: Unauthorized
+
+  /notification/unread-count:
+    get:
+      tags:
+        - notifications
+      summary: Get unread notification count
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Unread count retrieved successfully"
+                  data:
+                    type: number
+                    example: 5
+        '401':
+          description: Unauthorized
+
+  /notification/send:
+    post:
+      tags:
+        - notifications
+      summary: Send notification to users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSend'
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: Bad request - Validation error or invalid recipients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - Invalid data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /notification/bulk-read:
+    post:
+      tags:
+        - notifications
+      summary: Mark multiple notifications as read
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkNotificationRead'
+      responses:
+        '200':
+          description: Notifications marked as read successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkNotificationResponse'
+        '400':
+          description: Bad request - Validation error or invalid notification IDs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Unprocessable entity - Invalid data format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  # Enhanced Ingredient Stock Management endpoints
+  /stock/ingredients/stock:
+    get:
+      tags:
+        - stock
+      summary: Get all ingredients with stock information (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ingredients stock retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientStockListResponse'
+        '401':
+          description: Unauthorized
+
+  /stock/ingredients/{ingredientId}/stock:
+    put:
+      tags:
+        - stock
+      summary: Update ingredient stock (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockUpdate'
+      responses:
+        '200':
+          description: Stock updated successfully
+        '401':
+          description: Unauthorized
+
+  /stock/ingredients/{ingredientId}/add-stock:
+    post:
+      tags:
+        - stock
+      summary: Add stock to ingredient (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockAddition'
+      responses:
+        '200':
+          description: Stock added successfully
+        '401':
+          description: Unauthorized
+
+  /stock/ingredients/{ingredientId}/batches:
+    post:
+      tags:
+        - stock
+      summary: Add ingredient batch (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchCreate'
+      responses:
+        '201':
+          description: Batch created successfully
+        '401':
+          description: Unauthorized
+
+    get:
+      tags:
+        - stock
+      summary: Get ingredient batches (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Batches retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchListResponse'
+        '401':
+          description: Unauthorized
+
+  /stock/batches/expiring:
+    get:
+      tags:
+        - stock
+      summary: Get expiring batches (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Expiring batches retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpiringBatchesResponse'
+        '401':
+          description: Unauthorized
+
+  /stock/ingredients/low-stock:
+    get:
+      tags:
+        - stock
+      summary: Get low stock ingredients (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Low stock ingredients retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LowStockResponse'
+        '401':
+          description: Unauthorized
+
+  /stock/ingredients/out-of-stock:
+    get:
+      tags:
+        - stock
+      summary: Get out of stock ingredients (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Out of stock ingredients retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutOfStockResponse'
+        '401':
+          description: Unauthorized
+
+  /stock/meals/{mealId}/availability:
+    get:
+      tags:
+        - stock
+      summary: Check meal availability based on stock
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meal availability checked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealAvailabilityResponse'
+        '404':
+          description: Meal not found
+
+  /stock/stock/report:
+    get:
+      tags:
+        - stock
+      summary: Get comprehensive stock report (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Stock report generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockReportResponse'
+        '401':
+          description: Unauthorized
+
+  # Normalized Entities Management endpoints
+  /entities/allergens:
+    get:
+      tags:
+        - entities
+      summary: Get all allergens
+      responses:
+        '200':
+          description: Allergens retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllergenListResponse'
+        '400':
+          description: Bad request
+
+    post:
+      tags:
+        - entities
+      summary: Create a new allergen (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllergenCreate'
+      responses:
+        '201':
+          description: Allergen created successfully
+        '401':
+          description: Unauthorized
+
+  /entities/allergens/{allergenId}:
+    put:
+      tags:
+        - entities
+      summary: Update allergen (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: allergenId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllergenUpdate'
+      responses:
+        '200':
+          description: Allergen updated successfully
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - entities
+      summary: Delete allergen (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: allergenId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Allergen deleted successfully
+        '401':
+          description: Unauthorized
+
+  /entities/ingredients:
+    get:
+      tags:
+        - entities
+      summary: Get all ingredients
+      responses:
+        '200':
+          description: Ingredients retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngredientListResponse'
+        '400':
+          description: Bad request
+
+    post:
+      tags:
+        - entities
+      summary: Create a new ingredient (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientCreate'
+      responses:
+        '201':
+          description: Ingredient created successfully
+        '401':
+          description: Unauthorized
+
+  /entities/ingredients/{ingredientId}:
+    put:
+      tags:
+        - entities
+      summary: Update ingredient (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngredientUpdate'
+      responses:
+        '200':
+          description: Ingredient updated successfully
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - entities
+      summary: Delete ingredient (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ingredient deleted successfully
+        '401':
+          description: Unauthorized
+
+  /entities/tags:
+    get:
+      tags:
+        - entities
+      summary: Get all tags
+      responses:
+        '200':
+          description: Tags retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagListResponse'
+        '400':
+          description: Bad request
+
+    post:
+      tags:
+        - entities
+      summary: Create a new tag (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagCreate'
+      responses:
+        '201':
+          description: Tag created successfully
+        '401':
+          description: Unauthorized
+
+  /entities/tags/{tagId}:
+    put:
+      tags:
+        - entities
+      summary: Update tag (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagUpdate'
+      responses:
+        '200':
+          description: Tag updated successfully
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - entities
+      summary: Delete tag (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tag deleted successfully
+        '401':
+          description: Unauthorized
+
+  # Meal Relationship Management endpoints
+  /entities/meals/allergens:
+    post:
+      tags:
+        - entities
+      summary: Add allergen to meal (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealAllergenAdd'
+      responses:
+        '200':
+          description: Allergen added to meal successfully
+        '401':
+          description: Unauthorized
+
+  /entities/meals/{mealId}/allergens/{allergenId}:
+    delete:
+      tags:
+        - entities
+      summary: Remove allergen from meal (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: allergenId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Allergen removed from meal successfully
+        '401':
+          description: Unauthorized
+
+  /entities/meals/ingredients:
+    post:
+      tags:
+        - entities
+      summary: Add ingredient to meal (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealIngredientAdd'
+      responses:
+        '200':
+          description: Ingredient added to meal successfully
+        '401':
+          description: Unauthorized
+
+  /entities/meals/{mealId}/ingredients/{ingredientId}:
+    put:
+      tags:
+        - entities
+      summary: Update meal ingredient (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealIngredientUpdate'
+      responses:
+        '200':
+          description: Meal ingredient updated successfully
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - entities
+      summary: Remove ingredient from meal (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ingredientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ingredient removed from meal successfully
+        '401':
+          description: Unauthorized
+
+  /entities/meals/tags:
+    post:
+      tags:
+        - entities
+      summary: Add tag to meal (Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MealTagAdd'
+      responses:
+        '200':
+          description: Tag added to meal successfully
+        '401':
+          description: Unauthorized
+
+  /entities/meals/{mealId}/tags/{tagId}:
+    delete:
+      tags:
+        - entities
+      summary: Remove tag from meal (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tagId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tag removed from meal successfully
+        '401':
+          description: Unauthorized
+
+  # Enhanced Order History endpoints
+  /history/orders/{orderId}/history:
+    get:
+      tags:
+        - history
+      summary: Get detailed order history (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHistoryDetail'
+        '401':
+          description: Unauthorized
+
+  /history/orders/{orderId}/timeline:
+    get:
+      tags:
+        - history
+      summary: Get order timeline (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order timeline retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderTimeline'
+        '401':
+          description: Unauthorized
+
+  /history/orders/{orderId}/statistics:
+    get:
+      tags:
+        - history
+      summary: Get order statistics (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStatistics'
+        '401':
+          description: Unauthorized
+
+  /history/users/{userId}/history:
+    get:
+      tags:
+        - history
+      summary: Get user order history
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User order history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrderHistory'
+        '401':
+          description: Unauthorized
+
+  /history/recent-activity:
+    get:
+      tags:
+        - history
+      summary: Get recent order activity (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Recent activity retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecentActivity'
+        '401':
+          description: Unauthorized
+
+  /history/status/{status}:
+    get:
+      tags:
+        - history
+      summary: Get recent orders by status (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [pending, confirmed, preparing, ready, delivered, cancelled]
+      responses:
+        '200':
+          description: Orders by status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersByStatus'
+        '401':
+          description: Unauthorized
+
+  /history/summary:
+    get:
+      tags:
+        - history
+      summary: Get order history summary (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Order history summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHistorySummary'
+        '401':
+          description: Unauthorized
+
+  /history/search:
+    get:
+      tags:
+        - history
+      summary: Search order history (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderHistorySearchResults'
+        '401':
+          description: Unauthorized
+  /kitchen-rules:
+    get:
+      tags:
+        - Kitchen Rules
+      summary: Get all kitchen rules
+      description: |
+        Public endpoint to retrieve all active kitchen rules with pagination and search capabilities.
+        No authentication required.
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: Search term for filtering rules by kitchen ID or rule content
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved kitchen rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      kitchenRules:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/KitchenRules'
+                      pagination:
+                        $ref: '#/components/schemas/PaginationInfo'
+                  message:
+                    type: string
+                  statusCode:
+                    type: integer
+        '400':
+          description: Bad request, invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Kitchen Rules
+      summary: Create kitchen rules (Admin only)
+      description: |
+        Admin endpoint to create kitchen rules for any kitchen.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKitchenRulesRequest'
+            example:
+              kitchenId: "001"
+              rules:
+                - "Always wash hands before handling food"
+                - "Keep work surfaces clean and sanitized"
+                - "Store raw meat separately from other foods"
+                - "Check expiration dates regularly"
+                - "Maintain proper temperature for hot and cold foods"
+      responses:
+        '201':
+          description: Kitchen rules created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - kitchen rules already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /kitchen-rules/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Unique identifier for the kitchen rules
+        schema:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+
+    put:
+      tags:
+        - Kitchen Rules
+      summary: Update kitchen rules by ID (Admin only)
+      description: |
+        Admin endpoint to update kitchen rules by their unique identifier.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKitchenRulesRequest'
+            example:
+              rules:
+                - "Always wash hands before handling food"
+                - "Keep work surfaces clean and sanitized"
+                - "Store raw meat separately from other foods"
+                - "Check expiration dates regularly"
+                - "Maintain proper temperature for hot and cold foods"
+                - "Use separate cutting boards for different food types"
+      responses:
+        '200':
+          description: Kitchen rules updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Kitchen Rules
+      summary: Soft delete kitchen rules by ID (Admin only)
+      description: |
+        Admin endpoint to soft delete kitchen rules by their unique identifier.
+        This marks the rules as inactive but preserves the data.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Kitchen rules soft deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /kitchen-rules/{id}/hard-delete:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Unique identifier for the kitchen rules
+        schema:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+
+    delete:
+      tags:
+        - Kitchen Rules
+      summary: Hard delete kitchen rules (Admin only)
+      description: |
+        Admin endpoint to permanently delete kitchen rules from the database.
+        *WARNING*: This action cannot be undone. Use with extreme caution.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Kitchen rules permanently deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /kitchen-rules/kitchen/{kitchenId}:
+    parameters:
+      - name: kitchenId
+        in: path
+        required: true
+        description: Kitchen identifier (corresponds to User.kitchenNo)
+        schema:
+          type: string
+          pattern: '^[0-9A-Za-z]+$'
+
+    get:
+      tags:
+        - Kitchen Rules
+      summary: Get kitchen rules by kitchen ID
+      description: |
+        Public endpoint to retrieve kitchen rules for a specific kitchen.
+        No authentication required.
+      responses:
+        '200':
+          description: Successfully retrieved kitchen rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '404':
+          description: Kitchen rules not found for this kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Kitchen Rules
+      summary: Update kitchen rules by kitchen ID (Admin only)
+      description: |
+        Admin endpoint to update kitchen rules for a specific kitchen.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKitchenRulesRequest'
+            example:
+              rules:
+                - "Always wash hands before handling food"
+                - "Keep work surfaces clean and sanitized"
+                - "Store raw meat separately from other foods"
+                - "Check expiration dates regularly"
+                - "Maintain proper temperature for hot and cold foods"
+                - "Use separate cutting boards for different food types"
+                - "Label all food containers with date and contents"
+      responses:
+        '200':
+          description: Kitchen rules updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found for this kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Kitchen Rules
+      summary: Soft delete kitchen rules by kitchen ID (Admin only)
+      description: |
+        Admin endpoint to soft delete kitchen rules for a specific kitchen.
+        This marks the rules as inactive but preserves the data.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Kitchen rules soft deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found for this kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /kitchen-rules/kitchen/{kitchenId}/rule:
+    parameters:
+      - name: kitchenId
+        in: path
+        required: true
+        description: Kitchen identifier (corresponds to User.kitchenNo)
+        schema:
+          type: string
+          pattern: '^[0-9A-Za-z]+$'
+
+    post:
+      tags:
+        - Kitchen Rules
+      summary: Add a single rule to kitchen rules (Admin only)
+      description: |
+        Admin endpoint to add a single rule to existing kitchen rules for a specific kitchen.
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddRuleRequest'
+            example:
+              rule: "Always wear hair nets and gloves when handling food"
+      responses:
+        '200':
+          description: Rule added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found for this kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /kitchen-rules/kitchen/{kitchenId}/rule/{ruleIndex}:
+    parameters:
+      - name: kitchenId
+        in: path
+        required: true
+        description: Kitchen identifier (corresponds to User.kitchenNo)
+        schema:
+          type: string
+          pattern: '^[0-9A-Za-z]+$'
+      - name: ruleIndex
+        in: path
+        required: true
+        description: Index of the rule to remove (0-based)
+        schema:
+          type: integer
+          minimum: 0
+
+    delete:
+      tags:
+        - Kitchen Rules
+      summary: Remove a single rule by index (Admin only)
+      description: |
+        Admin endpoint to remove a single rule from kitchen rules by its index position.
+        Index is 0-based (first rule is at index 0).
+        Requires admin role authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Rule removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - invalid rule index
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Kitchen rules not found for this kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /kitchen-rules/my-kitchen:
+    get:
+      tags:
+        - Kitchen Rules
+      summary: Get my kitchen rules
+      description: |
+        Get kitchen rules for the currently authenticated user's assigned kitchen.
+        Requires authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved kitchen rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - user not assigned to kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No rules found for this kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Kitchen Rules
+      summary: Create kitchen rules for my kitchen
+      description: |
+        Create kitchen rules for the currently authenticated user's assigned kitchen.
+        Requires authentication.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMyKitchenRulesRequest'
+            example:
+              rules:
+                - "Always wash hands before handling food"
+                - "Keep work surfaces clean and sanitized"
+                - "Store raw meat separately from other foods"
+                - "Check expiration dates regularly"
+      responses:
+        '201':
+          description: Kitchen rules created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenRulesResponse'
+        '400':
+          description: Bad request - validation error or user not assigned to kitchen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized - authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict - kitchen rules already exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    KitchenRules:
+      type: object
+      required:
+        - kitchenId
+        - rules
+        - isActive
+      properties:
+        _id:
+          type: string
+        kitchenId:
+          type: string
+        rules:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+
+    KitchenRulesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/KitchenRules'
+        message:
+          type: string
+        statusCode:
+          type: integer
+
+    PaginationInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+    CreateKitchenRulesRequest:
+      type: object
+      required:
+        - kitchenId
+        - rules
+      properties:
+        kitchenId:
+          type: string
+          description: Kitchen identifier (corresponds to User.kitchenNo)
+          example: "001"
+        rules:
+          type: array
+          description: Array of kitchen rules
+          items:
+            type: string
+          minItems: 1
+          example:
+            - "Always wash hands before handling food"
+            - "Keep work surfaces clean and sanitized"
+
+    CreateMyKitchenRulesRequest:
+      type: object
+      required:
+        - rules
+      properties:
+        rules:
+          type: array
+          description: Array of kitchen rules
+          items:
+            type: string
+          minItems: 1
+          example:
+            - "Always wash hands before handling food"
+            - "Keep work surfaces clean and sanitized"
+
+    UpdateKitchenRulesRequest:
+      type: object
+      required:
+        - rules
+      properties:
+        rules:
+          type: array
+          description: Array of kitchen rules
+          items:
+            type: string
+          minItems: 1
+          example:
+            - "Always wash hands before handling food"
+            - "Keep work surfaces clean and sanitized"
+
+    AddRuleRequest:
+      type: object
+      required:
+        - rule
+      properties:
+        rule:
+          type: string
+          description: Single rule to add
+          minLength: 1
+          example: "Always wear hair nets and gloves when handling food"
+
+    DeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Kitchen rules deleted successfully"
+        message:
+          type: string
+          example: "Success"
+        statusCode:
+          type: integer
+          example: 200
+
+    # Common schemas
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+
+    # Authentication schemas
+    UserRegistration:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - role
+      properties:
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          minLength: 6
+          example: password123
+        role:
+          type: string
+          enum: [user, chef, admin]
+          example: user
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          example: password123
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+            user:
+              $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        _id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    # Category schemas
+    CategoryCreate:
+      type: object
+      required:
+        - category
+      properties:
+        category:
+          type: string
+          example: Main Course
+
+    CategoryUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Main Course"
+          description: Category name
+        isActive:
+          type: boolean
+          example: true
+          description: Whether the category is active
+
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    CategoryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Category'
+
+    # Meal schemas
+    MealCreate:
+      type: object
+      required:
+        - title
+        - description
+        - price
+        - category
+        - prepTime
+        - cookTime
+        - servings
+        - isActive
+        - ingredients
+        - allergens
+        - dietaryInfo
+      properties:
+        title:
+          type: string
+          example: Grilled Chicken Breast
+        description:
+          type: string
+          example: Juicy grilled chicken breast with herbs
+        price:
+          type: number
+          format: float
+          example: 25.99
+        category:
+          type: string
+          example: "60f7b3b3b3b3b3b3b3b3b3b3"
+        prepTime:
+          type: integer
+          example: 30
+        cookTime:
+          type: integer
+          example: 20
+        servings:
+          type: integer
+          example: 2
+        isActive:
+          type: boolean
+          example: true
+        ingredients:
+          type: array
+          items:
+            type: string
+          example: ["chicken breast", "olive oil", "herbs"]
+        allergens:
+          type: array
+          items:
+            type: string
+          example: ["none"]
+        dietaryInfo:
+          $ref: '#/components/schemas/DietaryInfo'
+
+    DietaryInfo:
+      type: object
+      properties:
+        isVegetarian:
+          type: boolean
+          example: false
+        isVegan:
+          type: boolean
+          example: false
+        isGlutenFree:
+          type: boolean
+          example: true
+
+    Meal:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        category:
+          $ref: '#/components/schemas/Category'
+        prepTime:
+          type: integer
+        cookTime:
+          type: integer
+        servings:
+          type: integer
+        isActive:
+          type: boolean
+        ingredients:
+          type: array
+          items:
+            type: string
+        allergens:
+          type: array
+          items:
+            type: string
+        dietaryInfo:
+          $ref: '#/components/schemas/DietaryInfo'
+        createdAt:
+          type: string
+          format: date-time
+
+    MealUpdate:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        description:
+          type: string
+
+    MealResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Meal'
+
+    MealListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Meal'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Meal Planning schemas
+    DailyMealPlan:
+      type: object
+      required:
+        - date
+        - type
+        - meals
+        - assignedStaff
+        - notes
+        - createdBy
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2024-01-15"
+        type:
+          type: string
+          enum: [day]
+          example: day
+        meals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealPlanItem'
+        assignedStaff:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+          example: Daily meal plan for restaurant operations
+        createdBy:
+          type: string
+
+    WeeklyMealPlan:
+      type: object
+      required:
+        - startDate
+        - endDate
+        - type
+        - meals
+        - assignedStaff
+        - notes
+        - createdBy
+      properties:
+        startDate:
+          type: string
+          format: date
+          example: "2024-01-15"
+        endDate:
+          type: string
+          format: date
+          example: "2024-01-21"
+        type:
+          type: string
+          enum: [week]
+          example: week
+        meals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealPlanItem'
+        assignedStaff:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+          example: Weekly meal plan for restaurant operations
+        createdBy:
+          type: string
+
+    MealPlanItem:
+      type: object
+      properties:
+        mealId:
+          type: string
+        servings:
+          type: integer
+          example: 50
+
+    MealPlan:
+      type: object
+      properties:
+        _id:
+          type: string
+        date:
+          type: string
+          format: date
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        type:
+          type: string
+          enum: [day, week]
+        meals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealPlanItem'
+        assignedStaff:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    MealPlanResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/MealPlan'
+
+    StockCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            available:
+              type: boolean
+            missingItems:
+              type: array
+              items:
+                type: string
+
+    ResourceCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            available:
+              type: boolean
+            missingResources:
+              type: array
+              items:
+                type: string
+
+    # Chef schemas
+    Chef:
+      type: object
+      properties:
+        _id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        specialties:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+
+    LowStockResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            lowStock:
+              type: boolean
+            items:
+              type: array
+              items:
+                type: string
+
+    AttendanceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              clockIn:
+                type: string
+                format: time
+              clockOut:
+                type: string
+                format: time
+
+    # Staff Management schemas
+    StaffCreate:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - role
+      properties:
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        password:
+          type: string
+          minLength: 6
+          example: password123
+        role:
+          type: string
+          enum: [chef, admin, user]
+          example: chef
+
+    StaffUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [chef, admin, user]
+        isActive:
+          type: boolean
+
+    StaffResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            _id:
+              type: string
+            firstName:
+              type: string
+            lastName:
+              type: string
+            email:
+              type: string
+            role:
+              type: string
+            isActive:
+              type: boolean
+            createdAt:
+              type: string
+              format: date-time
+
+    StaffListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              role:
+                type: string
+              isActive:
+                type: boolean
+              createdAt:
+                type: string
+                format: date-time
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Stripe Payment schemas
+    StripePaymentIntentCreate:
+      type: object
+      required:
+        - orderId
+      properties:
+        orderId:
+          type: string
+          pattern: '^[0-9a-fA-F]{24}$'
+          description: The ID of the order for which to create a payment intent.
+          example: "60f7b3b3b3b3b3b3b3b3b3b3"
+        currency:
+          type: string
+          pattern: '^[a-zA-Z]{3}$'
+          default: "usd"
+          example: "usd"
+          description: "The three-letter ISO currency code (e.g., 'usd', 'eur'). Defaults to 'USD' if not provided."
+
+    StripePaymentIntentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            clientSecret:
+              type: string
+            paymentIntentId:
+              type: string
+            paymentId:
+              type: string
+              description: The internal database ID of the payment record.
+            amount:
+              type: integer
+            currency:
+              type: string
+            status:
+              type: string
+
+
+    # Customer schemas
+    CustomerCreate:
+      type: object
+      required:
+        - userId
+        - billingInfo
+        - preferences
+      properties:
+        userId:
+          type: string
+        billingInfo:
+          $ref: '#/components/schemas/BillingInfo'
+        preferences:
+          $ref: '#/components/schemas/CustomerPreferences'
+
+    BillingInfo:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        company:
+          type: string
+        taxId:
+          type: string
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipCode:
+          type: string
+        country:
+          type: string
+
+    CustomerPreferences:
+      type: object
+      properties:
+        dietaryRestrictions:
+          type: array
+          items:
+            type: string
+        allergies:
+          type: array
+          items:
+            type: string
+        preferredPaymentMethod:
+          type: string
+        newsletterSubscription:
+          type: boolean
+        marketingEmails:
+          type: boolean
+
+    Customer:
+      type: object
+      properties:
+        _id:
+          type: string
+        userId:
+          type: string
+        billingInfo:
+          $ref: '#/components/schemas/BillingInfo'
+        preferences:
+          $ref: '#/components/schemas/CustomerPreferences'
+        loyaltyPoints:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive]
+        createdAt:
+          type: string
+          format: date-time
+
+    CustomerUpdate:
+      type: object
+      properties:
+        preferences:
+          $ref: '#/components/schemas/CustomerPreferences'
+
+    BillingInfoUpdate:
+      type: object
+      properties:
+        billingInfo:
+          $ref: '#/components/schemas/BillingInfo'
+
+    PreferencesUpdate:
+      type: object
+      properties:
+        preferences:
+          $ref: '#/components/schemas/CustomerPreferences'
+
+    LoyaltyPointsAdd:
+      type: object
+      required:
+        - points
+        - reason
+      properties:
+        points:
+          type: integer
+          example: 50
+        reason:
+          type: string
+          example: Referral bonus
+
+    CustomerResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Customer'
+
+    CustomerListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CustomerStats:
+      type: object
+      properties:
+        totalCustomers:
+          type: integer
+        activeCustomers:
+          type: integer
+        newCustomersThisMonth:
+          type: integer
+        averageOrderValue:
+          type: number
+          format: float
+
+    # Order schemas
+    CheckoutRequest:
+      type: object
+      required:
+        - arrayOfMeals
+      properties:
+        arrayOfMeals:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            required:
+              - _id
+              - qty
+            properties:
+              _id:
+                type: string
+                pattern: '^[0-9a-fA-F]{24}$'
+                example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                description: Meal ID
+              qty:
+                type: integer
+                minimum: 1
+                maximum: 100
+                example: 2
+                description: Quantity of this meal
+          description: Array of meals with quantities for checkout
+
+    CheckoutResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            total:
+              type: number
+              format: float
+            subTotal:
+              type: number
+              format: float
+            tax:
+              type: number
+              format: float
+
+    OrderCreate:
+      type: object
+      required:
+        - meals
+        - total
+        - subTotal
+        - tax
+        - deliveryFee
+        - discount
+        - billingInfo
+        - deliveryAddress
+      properties:
+        meals:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            required:
+              - _id
+              - qty
+            properties:
+              _id:
+                type: string
+                pattern: '^[0-9a-fA-F]{24}$'
+                example: "60f7b3b3b3b3b3b3b3b3b3b3"
+                description: Meal ID
+              qty:
+                type: integer
+                minimum: 1
+                maximum: 100
+                example: 2
+                description: Quantity of this meal
+          description: Array of meals with quantities
+        total:
+          type: number
+          format: float
+          minimum: 0.01
+          maximum: 9999.99
+          example: 51.98
+          description: Total order amount including all fees and taxes
+        subTotal:
+          type: number
+          format: float
+          minimum: 0.01
+          maximum: 9999.99
+          example: 47.98
+          description: Subtotal before fees and taxes
+        tax:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 999.99
+          example: 4.00
+          description: Tax amount
+        deliveryFee:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 999.99
+          example: 5.00
+          description: Delivery fee
+        discount:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 999.99
+          example: 5.00
+          description: Discount amount
+        billingInfo:
+          $ref: '#/components/schemas/BillingInfo'
+          description: Customer billing information
+        deliveryAddress:
+          $ref: '#/components/schemas/DeliveryAddress'
+          description: Delivery address
+        specialInstructions:
+          type: string
+          maxLength: 500
+          example: "Extra spicy please"
+          description: Special instructions for the order
+
+    DeliveryAddress:
+      type: object
+      required:
+        - street
+        - city
+        - state
+        - zipCode
+        - country
+      properties:
+        street:
+          type: string
+          minLength: 5
+          maxLength: 200
+          example: "123 Main Street"
+          description: Street address
+        city:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "New York"
+          description: City name
+        state:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "NY"
+          description: State or province
+        zipCode:
+          type: string
+          minLength: 3
+          maxLength: 20
+          example: "10001"
+          description: ZIP or postal code
+        country:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: "USA"
+          description: Country name
+        instructions:
+          type: string
+          maxLength: 500
+          example: "Leave at front door"
+          description: Special delivery instructions (optional)
+
+    Order:
+      type: object
+      properties:
+        _id:
+          type: string
+        meals:
+          type: array
+          items:
+            type: object
+        total:
+          type: number
+          format: float
+        subTotal:
+          type: number
+          format: float
+        tax:
+          type: number
+          format: float
+        deliveryFee:
+          type: number
+          format: float
+        discount:
+          type: number
+          format: float
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivered, cancelled]
+        billingInfo:
+          $ref: '#/components/schemas/BillingInfo'
+        deliveryAddress:
+          $ref: '#/components/schemas/DeliveryAddress'
+        specialInstructions:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    OrderStatusUpdate:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [pending, confirmed, preparing, ready, delivered, cancelled]
+          example: "preparing"
+          description: New order status
+        notes:
+          type: string
+          maxLength: 500
+          example: "Order is being prepared"
+          description: Additional notes about the status change (optional)
+
+    OrderResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Order'
+
+    OrderListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Payment schemas
+    PaymentCreate:
+      type: object
+      required:
+        - orderId
+        - status
+        - paymentDetails
+      properties:
+        orderId:
+          type: string
+          example: "60c72b2f9b1d8c001f8e4a3b"
+        status:
+          type: string
+          enum: [pending, completed, failed, refunded]
+          example: "completed"
+        paymentDetails:
+          type: object
+          required:
+            - transaction_id
+            - paymentSource
+          properties:
+            transaction_id:
+              type: string
+              example: "PAYPAL_TRANSACTION_ID_12345XYZ"
+            paymentSource:
+              type: object
+              properties:
+                paypal:
+                  type: object
+                  required:
+                    - email_address
+                    - account_id
+                  properties:
+                    email_address:
+                      type: string
+                      format: email
+                      example: "buyer-test@example.com"
+                    account_id:
+                      type: string
+                      example: "PAYPAL_ACCOUNT_ID_ABCDE"
+
+
+    PaymentDetails:
+      type: object
+      properties:
+        cardType:
+          type: string
+          example: visa
+        last4Digits:
+          type: string
+          example: "1234"
+        cardBrand:
+          type: string
+          example: Visa
+        transactionId:
+          type: string
+          example: txn_123456789
+
+    PaymentFees:
+      type: object
+      properties:
+        processingFee:
+          type: number
+          format: float
+          example: 2.50
+        taxAmount:
+          type: number
+          format: float
+          example: 4.00
+        discountAmount:
+          type: number
+          format: float
+          example: 5.00
+
+    Payment:
+      type: object
+      properties:
+        _id:
+          type: string
+        orderId:
+          type: string
+        customerId:
+          type: string
+        amount:
+          type: number
+          format: float
+        currency:
+          type: string
+        type:
+          type: string
+        method:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, failed, refunded]
+        paymentDetails:
+          $ref: '#/components/schemas/PaymentDetails'
+        billingAddress:
+          $ref: '#/components/schemas/Address'
+        fees:
+          $ref: '#/components/schemas/PaymentFees'
+        createdAt:
+          type: string
+          format: date-time
+
+    PaymentStatusUpdate:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [pending, completed, failed, refunded]
+          example: completed
+        notes:
+          type: string
+          example: Payment processed successfully
+
+    RefundRequest:
+      type: object
+      required:
+        - refundAmount
+        - reason
+      properties:
+        refundAmount:
+          type: number
+          format: float
+          example: 25.00
+        reason:
+          type: string
+          example: Customer requested partial refund
+
+    PaymentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Payment'
+
+    PaymentListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    PaymentStats:
+      type: object
+      properties:
+        totalRevenue:
+          type: number
+          format: float
+        totalTransactions:
+          type: integer
+        averageTransactionValue:
+          type: number
+          format: float
+        refundAmount:
+          type: number
+          format: float
+
+    # Dashboard schemas
+    DashboardStats:
+      type: object
+      properties:
+        totalOrders:
+          type: integer
+        totalRevenue:
+          type: number
+          format: float
+        totalCustomers:
+          type: integer
+        averageOrderValue:
+          type: number
+          format: float
+
+    IncomeStats:
+      type: object
+      properties:
+        dailyIncome:
+          type: number
+          format: float
+        weeklyIncome:
+          type: number
+          format: float
+        monthlyIncome:
+          type: number
+          format: float
+        yearlyIncome:
+          type: number
+          format: float
+
+    OrderStats:
+      type: object
+      properties:
+        todayOrders:
+          type: integer
+        weekOrders:
+          type: integer
+        monthOrders:
+          type: integer
+        pendingOrders:
+          type: integer
+
+    # Newsletter schemas
+    NewsletterSubscription:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+
+    # History schemas
+    OrderHistoryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Order'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Stock schemas
+    StockResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              quantity:
+                type: integer
+              unit:
+                type: string
+              lowStockThreshold:
+                type: integer
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Entities schemas
+    EntitiesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Notification schemas
+    NotificationSend:
+      type: object
+      required:
+        - title
+        - message
+        - type
+        - recipients
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "System Maintenance"
+          description: Notification title
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          example: "System will be down for maintenance"
+          description: Notification message
+        type:
+          type: string
+          enum: [info, warning, error, success]
+          example: "info"
+          description: Notification type
+        recipients:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$|^all$'
+          description: Array of user IDs or 'all' for all users
+          example: ["60f7b3b3b3b3b3b3b3b3b3b3"]
+        priority:
+          type: string
+          enum: [low, normal, high]
+          default: "normal"
+          description: Notification priority level
+
+    NotificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            _id:
+              type: string
+            title:
+              type: string
+            message:
+              type: string
+            type:
+              type: string
+            recipients:
+              type: array
+              items:
+                type: string
+            priority:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+
+    UnreadCountResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            unreadCount:
+              type: integer
+              example: 5
+
+    BulkNotificationRead:
+      type: object
+      required:
+        - notificationIds
+      properties:
+        notificationIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            pattern: '^[0-9a-fA-F]{24}$'
+          example: ["60f7b3b3b3b3b3b3b3b3b3b3", "60f7b3b3b3b3b3b3b3b3b3b4"]
+          description: Array of notification IDs to mark as read
+
+    BulkNotificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            updatedCount:
+              type: integer
+              example: 2
+            message:
+              type: string
+              example: Notifications marked as read successfully
+
+    # Stock Management schemas
+    StockUpdate:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: number
+          minimum: 0
+        lowStockThreshold:
+          type: number
+          minimum: 0
+
+    StockAddition:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: number
+          minimum: 0
+        unit:
+          type: string
+        cost:
+          type: number
+          minimum: 0
+
+    BatchCreate:
+      type: object
+      required:
+        - quantity
+        - expiryDate
+      properties:
+        quantity:
+          type: number
+          minimum: 0
+        expiryDate:
+          type: string
+          format: date
+        cost:
+          type: number
+          minimum: 0
+        supplier:
+          type: string
+
+    BatchListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              quantity:
+                type: number
+              expiryDate:
+                type: string
+                format: date
+              cost:
+                type: number
+              supplier:
+                type: string
+
+    ExpiringBatchesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              ingredientName:
+                type: string
+              quantity:
+                type: number
+              expiryDate:
+                type: string
+                format: date
+
+    # Meal Relationship schemas
+    MealAllergenAdd:
+      type: object
+      required:
+        - mealId
+        - allergenId
+      properties:
+        mealId:
+          type: string
+        allergenId:
+          type: string
+
+    MealIngredientAdd:
+      type: object
+      required:
+        - mealId
+        - ingredientId
+        - quantity
+        - unit
+      properties:
+        mealId:
+          type: string
+        ingredientId:
+          type: string
+        quantity:
+          type: number
+          minimum: 0
+        unit:
+          type: string
+
+    MealIngredientUpdate:
+      type: object
+      properties:
+        quantity:
+          type: number
+          minimum: 0
+        unit:
+          type: string
+
+    MealTagAdd:
+      type: object
+      required:
+        - mealId
+        - tagId
+      properties:
+        mealId:
+          type: string
+        tagId:
+          type: string
+
+    # Meal Planning schemas
+    MealPlanCreate:
+      type: object
+      required:
+        - name
+        - description
+        - meals
+        - startDate
+        - endDate
+      properties:
+        name:
+          type: string
+          example: Weekly Family Plan
+        description:
+          type: string
+          example: Balanced meals for the whole family
+        meals:
+          type: array
+          items:
+            type: object
+            properties:
+              mealId:
+                type: string
+              dayOfWeek:
+                type: string
+                enum: [monday, tuesday, wednesday, thursday, friday, saturday, sunday]
+              mealType:
+                type: string
+                enum: [breakfast, lunch, dinner, snack]
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        isActive:
+          type: boolean
+          default: true
+
+    MealPlanListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              startDate:
+                type: string
+                format: date
+              endDate:
+                type: string
+                format: date
+              isActive:
+                type: boolean
+
+    MealPlanStockCheck:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            mealPlanId:
+              type: string
+            available:
+              type: boolean
+            missingIngredients:
+              type: array
+              items:
+                type: object
+                properties:
+                  ingredientName:
+                    type: string
+                  requiredQuantity:
+                    type: number
+                  availableQuantity:
+                    type: number
+
+    MealPlanResourceCheck:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            mealPlanId:
+              type: string
+            estimatedCost:
+              type: number
+            requiredIngredients:
+              type: array
+              items:
+                type: object
+                properties:
+                  ingredientId:
+                    type: string
+                  ingredientName:
+                    type: string
+                  quantity:
+                    type: number
+                  unit:
+                    type: string
+            preparationTime:
+              type: number
+            chefRequirements:
+              type: array
+              items:
+                type: object
+                properties:
+                  chefId:
+                    type: string
+                  chefName:
+                    type: string
+                  specialty:
+                    type: string
+                  estimatedHours:
+                    type: number
+
+    # Order History schemas
+    OrderHistoryDetail:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+            statusHistory:
+              type: array
+              items:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  updatedBy:
+                    type: string
+                  notes:
+                    type: string
+
+    OrderTimeline:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+            timeline:
+              type: array
+              items:
+                type: object
+                properties:
+                  event:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  duration:
+                    type: number
+                  notes:
+                    type: string
+
+    OrderStatistics:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+            totalPreparationTime:
+              type: number
+            averagePreparationTime:
+              type: number
+            statusDistribution:
+              type: object
+            customerSatisfaction:
+              type: number
+
+    UserOrderHistory:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              orderNumber:
+                type: string
+              status:
+                type: string
+              totalAmount:
+                type: number
+              orderDate:
+                type: string
+                format: date-time
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    RecentActivity:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              orderId:
+                type: string
+              action:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+              user:
+                type: string
+
+    OrdersByStatus:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              orderNumber:
+                type: string
+              status:
+                type: string
+              customerName:
+                type: string
+              orderDate:
+                type: string
+                format: date-time
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    OrderHistorySummary:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            totalOrders:
+              type: integer
+            ordersByStatus:
+              type: object
+            averageOrderValue:
+              type: number
+            topCustomers:
+              type: array
+              items:
+                type: object
+                properties:
+                  customerId:
+                    type: string
+                  customerName:
+                    type: string
+                  totalSpent:
+                    type: number
+                  orderCount:
+                    type: integer
+            recentTrends:
+              type: object
+
+    OrderHistorySearchResults:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              orderNumber:
+                type: string
+              status:
+                type: string
+              customerName:
+                type: string
+              orderDate:
+                type: string
+                format: date-time
+              totalAmount:
+                type: number
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Pagination schema
+    Pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          minimum: 1
+          description: Current page number
+        totalPages:
+          type: integer
+          minimum: 1
+          description: Total number of pages
+        totalItems:
+          type: integer
+          minimum: 0
+          description: Total number of items
+        itemsPerPage:
+          type: integer
+          minimum: 1
+          description: Number of items per page
+        hasNextPage:
+          type: boolean
+          description: Whether there is a next page
+        hasPrevPage:
+          type: boolean
+          description: Whether there is a previous page
+
+    # Error Response schemas
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Error message
+            code:
+              type: string
+              description: Error code
+            details:
+              type: object
+              description: Additional error details
+
+    ValidationError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Validation error message
+            field:
+              type: string
+              description: Field that failed validation
+            value:
+              type: string
+              description: Invalid value provided
+
+    # Success Response schemas
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Success message
+        data:
+          type: object
+          description: Response data
+
+    # Generic Response schemas
+    MessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    # File Upload schemas
+    FileUploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            filename:
+              type: string
+            originalName:
+              type: string
+            mimetype:
+              type: string
+            size:
+              type: integer
+            url:
+              type: string
+
+    # Missing schemas that are referenced
+    IngredientStockListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              currentStock:
+                type: number
+              lowStockThreshold:
+                type: number
+              unit:
+                type: string
+              lastUpdated:
+                type: string
+                format: date-time
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    OutOfStockResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              lastStockDate:
+                type: string
+                format: date-time
+              unit:
+                type: string
+
+    MealAvailabilityResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            mealId:
+              type: string
+            mealName:
+              type: string
+            available:
+              type: boolean
+            missingIngredients:
+              type: array
+              items:
+                type: object
+                properties:
+                  ingredientName:
+                    type: string
+                  requiredQuantity:
+                    type: number
+                  availableQuantity:
+                    type: number
+                  unit:
+                    type: string
+
+    StockReportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            totalIngredients:
+              type: integer
+            lowStockCount:
+              type: integer
+            outOfStockCount:
+              type: integer
+            expiringSoonCount:
+              type: integer
+            totalValue:
+              type: number
+            reportDate:
+              type: string
+              format: date-time
+
+    AllergenListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              severity:
+                type: string
+              isActive:
+                type: boolean
+
+    AllergenCreate:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          example: Peanuts
+        description:
+          type: string
+          example: Peanut allergy
+        severity:
+          type: string
+          enum: [low, medium, high]
+          example: high
+        isActive:
+          type: boolean
+          default: true
+
+    AllergenUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high]
+        isActive:
+          type: boolean
+
+    IngredientListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              category:
+                type: string
+              unit:
+                type: string
+              isActive:
+                type: boolean
+
+    IngredientCreate:
+      type: object
+      required:
+        - name
+        - description
+        - category
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Chicken Breast"
+          description: Ingredient name
+        description:
+          type: string
+          minLength: 10
+          maxLength: 500
+          example: "Fresh chicken breast meat"
+          description: Ingredient description
+        category:
+          type: string
+          enum: ['vegetable', 'fruit', 'meat', 'dairy', 'grain', 'spice', 'herb', 'other']
+          example: "meat"
+          description: Ingredient category
+        baseUnit:
+          type: string
+          enum: ['g', 'kg', 'ml', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'slice', 'whole']
+          default: 'g'
+          example: "g"
+          description: Base unit for calculations
+        packagingUnit:
+          type: string
+          enum: ['sack', 'bag', 'box', 'bottle', 'can', 'jar', 'pack', 'bundle', 'carton', 'piece', 'whole']
+          default: 'piece'
+          example: "piece"
+          description: Packaging unit
+        packagingQuantity:
+          type: number
+          minimum: 0.01
+          maximum: 10000
+          default: 1
+          example: 500
+          description: How much base unit is in each package
+        costPerPackage:
+          type: number
+          minimum: 0
+          maximum: 9999.99
+          default: 0
+          example: 5.99
+          description: Cost per package
+        reorderLevel:
+          type: number
+          minimum: 0
+          maximum: 10000
+          default: 10
+          example: 20
+          description: Stock level at which to reorder
+
+    IngredientUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        unit:
+          type: string
+        isActive:
+          type: boolean
+    TagListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              color:
+                type: string
+              isActive:
+                type: boolean
+
+    TagCreate:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          example: Spicy
+        description:
+          type: string
+          example: Spicy dishes
+        color:
+          type: string
+          example: #FF0000
+        isActive:
+          type: boolean
+          default: true
+
+    TagUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        color:
+          type: string
+        isActive:
+          type: boolean

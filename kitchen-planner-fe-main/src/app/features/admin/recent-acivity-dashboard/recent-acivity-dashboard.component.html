@@ -1,0 +1,89 @@
+<div class="activity-container">
+
+    <!-- Top Widget Header + Summary Cards -->
+    <div class="widget-header">
+        <h3>Recent Activities</h3>
+        <button mat-icon-button class="btn-refresh" (click)="fetchActivities()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+
+    <div class="summary-cards">
+        <mat-card class="summary-card" *ngFor="let s of ['pending', 'preparing', 'ready', 'delivered', 'cancelled']"
+            [style.border-top]="'4px solid ' + getStatusBadgeColor(s)">
+            <div class="summary-content">
+                <h4>{{ getStatusCount(s) }}</h4>
+                <p>{{ s | titlecase }}</p>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Button-based Filters -->
+    <div class="filters">
+        <button *ngFor="let filter of filters" (click)="applyFilter(filter)" [class.active]="selectedFilter === filter">
+            {{ filter | titlecase }}
+        </button>
+    </div>
+
+    <!-- Vertical Timeline -->
+    <div class="timeline">
+        <div *ngFor="let activity of filteredActivities; let last = last" class="timeline-item">
+
+            <!-- Status Marker -->
+            <div class="timeline-marker" [ngClass]="getStatusColor(activity.status)">
+                <mat-icon>{{ getStatusIcon(activity.status) }}</mat-icon>
+            </div>
+
+            <!-- Timeline Content -->
+            <div class="timeline-content">
+
+                <!-- Top Row: Order Number + Status Badge -->
+                <div class="top-row">
+                    <span class="order-number">{{ activity.orderNumber }}</span>
+                    <span class="status-badge" [ngStyle]="{'background-color': getStatusBadgeColor(activity.status)}">
+                        {{ activity.status | titlecase }}
+                    </span>
+                </div>
+
+                <!-- Info Row: Customer, Amount, Time -->
+                <div class="info-row">
+                    <span class="customer">
+                        <mat-icon>person</mat-icon>
+                        {{ activity.userId.firstName }} {{ activity.userId.lastName }}
+                    </span>
+                    <span class="amount">
+                        <mat-icon>euro_symbol</mat-icon>
+                        {{ activity.totalAmount }}
+                    </span>
+                    <span class="time">
+                        <mat-icon>schedule</mat-icon>
+                        {{ getTimeAgo(activity.changedAt) }}
+                    </span>
+                </div>
+
+                <!-- Notes -->
+                <p class="status-note">{{ activity.notes }}</p>
+
+                <!-- View Details Button -->
+                <button mat-stroked-button class="toggle-btn modern-btn" (click)="toggleDetails(activity)">
+                    {{ activity.showDetails ? 'Hide Details' : 'View Details' }}
+                </button>
+
+                <!-- Details -->
+                <div class="details" *ngIf="activity.showDetails">
+                    <p><strong>Previous Status:</strong> {{ activity.previousStatus || 'N/A' }}</p>
+                    <p><strong>Notes:</strong> {{ activity.notes }}</p>
+                    <p><strong>Changed By:</strong> {{ activity.changedBy.firstName }} {{ activity.changedBy.lastName }}
+                    </p>
+                    <p><strong>Created At:</strong> {{ activity.createdAt | date:'medium' }}</p>
+                    <p><strong>Updated At:</strong> {{ activity.updatedAt | date:'medium' }}</p>
+                </div>
+
+            </div>
+
+            <div class="timeline-line" *ngIf="!last"></div>
+        </div>
+
+    </div>
+
+</div>

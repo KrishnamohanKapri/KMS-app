@@ -1,0 +1,98 @@
+<app-navbar></app-navbar>
+
+<div *ngIf="meal" class="meal-detail-wrapper">
+
+  <div class="meal-hero">
+    <img [src]="meal.images[0]?.url" alt="{{ meal.title }}">
+    <div class="hero-overlay">
+      <h1>{{ meal.title }}</h1>
+      <span class="category">{{ meal.category?.name }}</span>
+      <span class="price">€{{ meal.price }}</span>
+      <div class="tags-overlay">
+        <span *ngFor="let tag of meal.tags" class="tag-chip" [ngStyle]="getTagStyle(tag)">
+          {{ tag.name }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="details-columns">
+
+    <div class="info-column">
+      <!-- Allergens -->
+      <mat-card class="info-card">
+        <h3>⚠️ Allergens</h3>
+        <div class="allergens">
+          <span *ngFor="let a of meal.allergens" class="allergen-chip">{{ a.name }}</span>
+        </div>
+      </mat-card>
+
+      <!-- Ingredients -->
+      <mat-card class="info-card">
+        <h3>🥗 Ingredients</h3>
+        <ul class="ingredients">
+          <li *ngFor="let i of meal.ingredients">
+            <strong>{{ i.ingredient.name }}</strong> – {{ i.ingredient.description }}
+          </li>
+        </ul>
+      </mat-card>
+    </div>
+
+    <div class="info-column">
+      <!-- Dietary Info -->
+      <mat-card class="info-card">
+        <h3>🌱 Dietary Info</h3>
+        <div class="dietary-grid">
+          <div class="diet-item" [ngClass]="getDietaryClass(meal?.dietaryInfo?.vegetarian)">
+            <mat-icon>{{ meal?.dietaryInfo?.vegetarian ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>Vegetarian</span>
+          </div>
+          <div class="diet-item" [ngClass]="getDietaryClass(meal?.dietaryInfo?.vegan)">
+            <mat-icon>{{ meal?.dietaryInfo?.vegan ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>Vegan</span>
+          </div>
+          <div class="diet-item" [ngClass]="getDietaryClass(meal?.dietaryInfo?.glutenFree)">
+            <mat-icon>{{ meal?.dietaryInfo?.glutenFree ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>Gluten Free</span>
+          </div>
+          <div class="diet-item" [ngClass]="getDietaryClass(meal?.dietaryInfo?.lactoseFree)">
+            <mat-icon>{{ meal?.dietaryInfo?.lactoseFree ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>Lactose Free</span>
+          </div>
+          <div class="diet-item" [ngClass]="getDietaryClass(meal?.dietaryInfo?.halal)">
+            <mat-icon>{{ meal?.dietaryInfo?.halal ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>Halal</span>
+          </div>
+          <div class="diet-item" [ngClass]="getDietaryClass(meal?.dietaryInfo?.kosher)">
+            <mat-icon>{{ meal?.dietaryInfo?.kosher ? 'check_circle' : 'cancel' }}</mat-icon>
+            <span>Kosher</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Nutritional Info -->
+      <mat-card class="info-card">
+        <h3>📊 Nutritional Info</h3>
+        <div class="nutrition-grid">
+          <div class="nutri-item"><strong>Energy:</strong> {{ meal.nutritionalInfo.energy.value }} {{ meal.nutritionalInfo.energy.unit }}</div>
+          <div class="nutri-item"><strong>Fat:</strong> {{ meal.nutritionalInfo.fat.value }} {{ meal.nutritionalInfo.fat.unit }}</div>
+          <div class="nutri-item"><strong>Saturated Fat:</strong> {{ meal.nutritionalInfo.saturatedFat.value }} {{ meal.nutritionalInfo.saturatedFat.unit }}</div>
+          <div class="nutri-item"><strong>Carbs:</strong> {{ meal.nutritionalInfo.carbohydrates.value }} {{ meal.nutritionalInfo.carbohydrates.unit }}</div>
+          <div class="nutri-item"><strong>Sugar:</strong> {{ meal.nutritionalInfo.sugar.value }} {{ meal.nutritionalInfo.sugar.unit }}</div>
+          <div class="nutri-item"><strong>Protein:</strong> {{ meal.nutritionalInfo.protein.value }} {{ meal.nutritionalInfo.protein.unit }}</div>
+          <div class="nutri-item"><strong>Salt:</strong> {{ meal.nutritionalInfo.salt.value }} {{ meal.nutritionalInfo.salt.unit }}</div>
+          <div class="nutri-item"><strong>Fiber:</strong> {{ meal.nutritionalInfo.fiber.value }} {{ meal.nutritionalInfo.fiber.unit }}</div>
+          <div class="nutri-item"><strong>NutriScore:</strong> {{ meal.nutritionalInfo.nutriScore }}</div>
+        </div>
+      </mat-card>
+    </div>
+
+  </div>
+
+  <div class="add-to-cart">
+    <button class="add-to-cart-btn" (click)="addToCart(meal)">
+      <mat-icon>add_shopping_cart</mat-icon> Add to Cart
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,59 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+ol {
+  padding-left: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+ol li {
+  margin: 0.6rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #00796b;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #00796b;
+  border-color: #00796b;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✔";
+  font-size: 12px;
+  color: white;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

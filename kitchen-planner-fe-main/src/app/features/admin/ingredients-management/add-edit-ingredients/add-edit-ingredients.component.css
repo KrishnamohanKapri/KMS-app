@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button[mat-raised-button] {
+  min-width: 120px;
+}
+
+button[mat-button] {
+  color: #666;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+div[style*="justify-content: flex-end"] {
+  margin-top: 1rem;
+}

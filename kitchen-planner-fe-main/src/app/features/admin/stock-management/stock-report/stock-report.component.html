@@ -1,0 +1,32 @@
+<div class="report-container">
+  <h2>Stock Report</h2>
+
+  <div class="summary-cards">
+    <div class="card">Total Ingredients <span>{{stockReport.totalIngredients}}</span></div>
+    <div class="card">Available <span>{{stockReport.available}}</span></div>
+    <div class="card">Out of Stock <span>{{stockReport.outOfStock}}</span></div>
+    <div class="card">Low Stock <span>{{stockReport.lowStock}}</span></div>
+  </div>
+
+  <h3>Category Breakdown</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Total</th>
+        <th>Available</th>
+        <th>Out of Stock</th>
+        <th>Low Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cat of (stockReport.categories | keyvalue)">
+        <td>{{cat.key}}</td>
+        <td>{{cat.value.count}}</td>
+        <td>{{cat.value.available}}</td>
+        <td>{{cat.value.outOfStock}}</td>
+        <td>{{cat.value.lowStock}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
