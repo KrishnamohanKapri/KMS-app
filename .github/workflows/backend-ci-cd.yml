@@ -1,0 +1,88 @@
+name: Build and Push Backend Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'kitchen-planner-be-main/**'
+      - '.github/workflows/backend-ci-cd.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/kms-backend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref, event=branch
+            type=sha, prefix={{branch}}-
+            type=raw, value=latest, enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./kitchen-planner-be-main
+          file: ./kitchen-planner-be-main/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate image tag
+        id: image-tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main"]; then
+            TAG="main-${GITHUB_SHA::8}"
+          else
+            TAG="${GITHUB_REF#refs/heads/}-${GITHUB_SHA::8}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Image tag: $TAG"
+
+      - name: Update GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: krishnamohankapri/KMS-gitops
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: gitops-repo
+
+      - name: Update backend image tag
+        run: |
+          cd gitops-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Update kustomization.yaml
+          TAG="${{ steps.image-tag.outputs.tag }}"
+          sed -i "s|newTag:.*|newTag: $TAG|" apps/backend/kustomization.yaml
+
+          git add apps/backend/kustomization.yaml
+          git commit -m "Update backend image to ${TAG}" || exit 0
+          git push
