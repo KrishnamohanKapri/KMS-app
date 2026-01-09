@@ -66,13 +66,20 @@ jobs:
           git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"
           git push origin "$NEW_VERSION"
 
+      - name: Get short SHA
+        id: sha
+        run: |
+          SHORT_SHA="${GITHUB_SHA::8}"
+          echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "Short SHA: $SHORT_SHA"
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ steps.version.outputs.version }}-${{ github.sha }}
+            type=raw,value=${{ steps.version.outputs.version }}-${{ steps.sha.outputs.short_sha }}
             type=raw,value=${{ steps.version.outputs.version }}
             type=raw,value=latest,enable={{ is_default_branch }}
 
@@ -92,7 +99,7 @@ jobs:
         run: |
           # Create hybrid tag: version + short commit SHA
           VERSION="${{ steps.version.outputs.version }}"
-          SHORT_SHA="${GITHUB_SHA::8}"
+          SHORT_SHA="${{ steps.sha.outputs.short_sha }}"
           HYBRID_TAG="${VERSION}-${SHORT_SHA}"
           
           echo "tag=$HYBRID_TAG" >> $GITHUB_OUTPUT
