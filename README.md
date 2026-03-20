@@ -1,3 +1,25 @@
+# Kitchen Management System (KMS)
+
+This repo (`KMS-app`) contains the full application for the Kitchen Management System:
+- Backend REST API (Node.js/Express + MongoDB)
+- Frontend web app (Angular)
+- API specifications (OpenAPI/Swagger)
+- Dockerfiles to build container images for both backend and frontend
+
+Key backend capabilities include JWT authentication with role-based access control (RBAC), WebSocket-based real-time updates, file uploads (Cloudinary), email notifications (Nodemailer), and payments (Stripe). The frontend uses Angular Material and builds dashboards and forms on top of the backend APIs (including Stripe checkout).
+
+Production delivery is handled by:
+- `KMS-infra` (Terraform + Ansible) to provision the Kubernetes cluster and install GitOps tooling
+- `KMS-gitops` to store Kubernetes manifests and Argo CD application definitions
+- `KMS-app` to build/publish images (GHCR) and keep the API contract (Swagger/OpenAPI) in sync
+
+Local development (high level):
+- Backend: `kitchen-planner-be-main/` (Node.js 18+, configure `.env`, run `npm run dev`, API on `localhost:8001`)
+- Frontend: `kitchen-planner-fe-main/` (run `npm start`, app on `localhost:4200`)
+
+<details>
+<summary>More details (engineering + deployment docs)</summary>
+
 # 🍽️ KMS Application Repository
 
 > **Source code for the Kitchen Management System (KMS) - Backend API, Frontend, and API Specifications**
@@ -700,3 +722,5 @@ For a complete deployment from scratch:
 ---
 
 **Built with ❤️ for the Kitchen Management System**
+
+</details>
